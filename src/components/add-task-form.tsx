@@ -167,8 +167,8 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
              )}
           </div>
           <DialogFooter>
-            <DialogClose> {/* Removed asChild prop to fix hydration error */}
-               <Button type="button" variant="secondary" className="rounded-none border-foreground">Cancel</Button> {/* Updated for pixel style */}
+            <DialogClose asChild> {/* Add asChild prop */}
+               <Button asChild type="button" variant="secondary" className="rounded-none border-foreground">Cancel</Button> {/* Add asChild prop */}
             </DialogClose>
             <Button type="submit" className="btn-pixel">Add Task</Button> {/* Use btn-pixel style */}
           </DialogFooter>
