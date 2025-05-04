@@ -50,13 +50,18 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
     const url = e.target.value;
     setCustomIconUrl(url);
     // Basic validation for URL format (optional)
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image')) { // Allow data URIs
+    // Allow http, https, and data URIs
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image')) {
         setSelectedIcon(url);
     } else if (url === '') {
        setSelectedIcon(defaultIcons[0]); // Reset to default if empty
+    } else {
+        // Optionally handle invalid URLs, maybe keep the previous icon?
+        // For now, it just won't update selectedIcon if format is not recognized
     }
     // Potentially add more robust URL validation or image loading preview
   };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,7 +173,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
           </div>
           <DialogFooter>
             <DialogClose asChild> {/* Add asChild prop */}
-               <Button asChild type="button" variant="secondary" className="rounded-none border-foreground">Cancel</Button> {/* Add asChild prop */}
+               <Button type="button" variant="secondary" className="rounded-none border-foreground">Cancel</Button> {/* REMOVED asChild prop */}
             </DialogClose>
             <Button type="submit" className="btn-pixel">Add Task</Button> {/* Use btn-pixel style */}
           </DialogFooter>
