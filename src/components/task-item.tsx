@@ -20,7 +20,7 @@ export function TaskItem({ task, onToggleComplete }: TaskItemProps) {
   return (
     <Card
       className={cn(
-        'flex items-start space-x-4 p-4 rounded-sm transition-opacity duration-300', // Use rounded-sm for pixel feel
+        'flex items-start space-x-4 p-4 rounded-none transition-opacity duration-300 border-foreground', // Use rounded-none for pixel feel, added border
         task.completed ? 'opacity-50 bg-muted' : 'opacity-100'
       )}
     >
@@ -30,7 +30,7 @@ export function TaskItem({ task, onToggleComplete }: TaskItemProps) {
           alt={task.title}
           width={48} // Slightly larger for pixel art
           height={48}
-          className="image-pixelated rounded-sm border border-border"
+          className="image-pixelated rounded-none border border-border" // Use rounded-none
           data-ai-hint="pixel art icon"
         />
       </div>
@@ -52,7 +52,7 @@ export function TaskItem({ task, onToggleComplete }: TaskItemProps) {
             checked={task.completed}
             onCheckedChange={handleCheckedChange}
             aria-labelledby={`label-${task.id}`}
-            className="size-5 rounded-sm" // Use rounded-sm
+            className="size-5 rounded-none border-foreground" // Use rounded-none, added border
           />
           <Label
             htmlFor={`task-${task.id}`}

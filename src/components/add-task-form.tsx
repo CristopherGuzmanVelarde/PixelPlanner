@@ -78,12 +78,12 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg btn-pixel">
+        <Button className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg btn-pixel"> {/* Use btn-pixel style */}
           <Plus className="h-6 w-6" />
           <span className="sr-only">Add New Task</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px] bg-card rounded-sm">
+      <DialogContent className="sm:max-w-[480px] bg-card rounded-none border-2 border-foreground"> {/* Updated for pixel style */}
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Add New Task</DialogTitle>
         </DialogHeader>
@@ -96,7 +96,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Water the plants"
               required
-              className="rounded-sm"
+              className="rounded-none border-foreground" /* Updated for pixel style */
             />
           </div>
           <div className="grid gap-2">
@@ -106,7 +106,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g., Use the green watering can"
-              className="rounded-sm"
+              className="rounded-none border-foreground" /* Updated for pixel style */
             />
           </div>
           <div className="grid gap-2">
@@ -117,7 +117,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
                   key={index}
                   type="button"
                   onClick={() => handleIconSelect(icon)}
-                  className={`p-1 border-2 rounded-sm transition-all ${selectedIcon === icon ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-border hover:border-accent'}`}
+                  className={`p-1 border-2 rounded-none transition-all ${selectedIcon === icon ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-border hover:border-accent'}`} /* Updated for pixel style */
                   aria-label={`Select icon ${index + 1}`}
                 >
                   <Image
@@ -138,10 +138,10 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
               value={customIconUrl}
               onChange={handleCustomIconChange}
               placeholder="https://..."
-              className="rounded-sm"
+              className="rounded-none border-foreground" /* Updated for pixel style */
             />
              {customIconUrl && selectedIcon === customIconUrl && (
-               <div className="mt-2 p-1 border-2 border-primary rounded-sm w-fit">
+               <div className="mt-2 p-1 border-2 border-primary rounded-none w-fit"> {/* Updated for pixel style */}
                  <Image
                     src={customIconUrl}
                     alt="Custom Icon Preview"
@@ -162,9 +162,9 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
           </div>
           <DialogFooter>
             <DialogClose asChild>
-               <Button type="button" variant="secondary" className="rounded-sm">Cancel</Button>
+               <Button type="button" variant="secondary" className="rounded-none border-foreground">Cancel</Button> {/* Updated for pixel style */}
             </DialogClose>
-            <Button type="submit" className="btn-pixel">Add Task</Button>
+            <Button type="submit" className="btn-pixel">Add Task</Button> {/* Use btn-pixel style */}
           </DialogFooter>
         </form>
       </DialogContent>

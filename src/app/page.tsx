@@ -82,14 +82,14 @@ export default function Home() {
 
   return (
     <div className="container mx-auto max-w-2xl py-8 px-4">
-      <Card className="bg-card/80 backdrop-blur-sm rounded-sm shadow-md">
+      <Card className="bg-card/80 backdrop-blur-sm rounded-none shadow-md border-2 border-foreground"> {/* Updated for pixel style */}
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-3xl font-bold text-primary tracking-wide">
             Pixel Planner
           </CardTitle>
            <p className="text-muted-foreground">Your daily tasks, pixelated.</p>
         </CardHeader>
-        <Separator className="mb-4"/>
+        <Separator className="mb-4 border-t-2 border-foreground"/> {/* Thicker separator */}
         <CardContent>
            {/* Only render TaskList and AddTaskForm on the client */}
            {isClient ? (
