@@ -18,6 +18,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"
+import { cn } from '@/lib/utils'; // Import cn
 
 interface AddTaskFormProps {
   onAddTask: (newTask: Omit<Task, 'id' | 'completed'>) => void;
@@ -49,7 +50,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
     const url = e.target.value;
     setCustomIconUrl(url);
     // Basic validation for URL format (optional)
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image')) { // Allow data URIs
         setSelectedIcon(url);
     } else if (url === '') {
        setSelectedIcon(defaultIcons[0]); // Reset to default if empty
@@ -78,7 +79,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg btn-pixel"> {/* Use btn-pixel style */}
+        <Button className={cn("fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg btn-pixel")}> {/* Use btn-pixel style */}
           <Plus className="h-6 w-6" />
           <span className="sr-only">Add New Task</span>
         </Button>
@@ -117,7 +118,12 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
                   key={index}
                   type="button"
                   onClick={() => handleIconSelect(icon)}
-                  className={`p-1 border-2 rounded-none transition-all ${selectedIcon === icon ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-border hover:border-accent'}`} /* Updated for pixel style */
+                  className={cn(
+                    'p-1 border-2 rounded-none transition-all',
+                    selectedIcon === icon
+                      ? 'border-primary ring-2 ring-primary ring-offset-2'
+                      : 'border-border hover:border-accent'
+                  )} /* Updated for pixel style */
                   aria-label={`Select icon ${index + 1}`}
                 >
                   <Image
@@ -137,7 +143,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
               type="url"
               value={customIconUrl}
               onChange={handleCustomIconChange}
-              placeholder="https://..."
+              placeholder="https://... or data:image/..."
               className="rounded-none border-foreground" /* Updated for pixel style */
             />
              {customIconUrl && selectedIcon === customIconUrl && (
@@ -161,7 +167,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
              )}
           </div>
           <DialogFooter>
-            <DialogClose asChild>
+            <DialogClose> {/* Removed asChild prop */}
                <Button type="button" variant="secondary" className="rounded-none border-foreground">Cancel</Button> {/* Updated for pixel style */}
             </DialogClose>
             <Button type="submit" className="btn-pixel">Add Task</Button> {/* Use btn-pixel style */}
