@@ -19,7 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import { generatePixelArtIcon } from '@/ai/flows/generate-pixel-art-flow';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Wand2 } from 'lucide-react'; // Replaced Sparkles with Wand2 for better semantics
 
 interface AddTaskFormProps {
   isOpen: boolean;
@@ -30,20 +30,20 @@ interface AddTaskFormProps {
 
 // Placeholder pixel art icons
 const defaultIcons = [
-  "https://picsum.photos/seed/food/64/64",
-  "https://picsum.photos/seed/work/64/64",
+  "https://picsum.photos/seed/comida/64/64",
+  "https://picsum.photos/seed/trabajo/64/64",
   "https://picsum.photos/seed/hobby/64/64",
-  "https://picsum.photos/seed/health/64/64",
-  "https://picsum.photos/seed/home/64/64",
+  "https://picsum.photos/seed/salud/64/64",
+  "https://picsum.photos/seed/hogar/64/64",
   "https://picsum.photos/seed/social/64/64",
 ];
 
 const defaultIconHints: Record<string, string> = {
-  "https://picsum.photos/seed/food/64/64": "food fruit",
-  "https://picsum.photos/seed/work/64/64": "work computer",
-  "https://picsum.photos/seed/hobby/64/64": "hobby book",
-  "https://picsum.photos/seed/health/64/64": "health heart",
-  "https://picsum.photos/seed/home/64/64": "home house",
+  "https://picsum.photos/seed/comida/64/64": "comida fruta",
+  "https://picsum.photos/seed/trabajo/64/64": "trabajo computadora",
+  "https://picsum.photos/seed/hobby/64/64": "hobby libro",
+  "https://picsum.photos/seed/salud/64/64": "salud corazon",
+  "https://picsum.photos/seed/hogar/64/64": "hogar casa",
   "https://picsum.photos/seed/social/64/64": "social chat",
 };
 
@@ -97,8 +97,8 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
     if (!title.trim()) return;
     if (!selectedIcon) {
         toast({
-            title: "Icon Required",
-            description: "Please select or generate an icon for the task.",
+            title: "Icono Requerido",
+            description: "Por favor, selecciona o genera un icono para la tarea.",
             variant: "destructive",
         });
         return;
@@ -115,8 +115,8 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
   const handleGenerateIcon = useCallback(async () => {
     if (!title.trim()) {
       toast({
-        title: "Title needed for icon generation",
-        description: "Please enter a task title to generate a relevant icon.",
+        title: "Título necesario para generar el icono",
+        description: "Por favor, ingresa un título para la tarea para generar un icono relevante.",
         variant: "destructive",
       });
       return;
@@ -126,19 +126,19 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
       const result = await generatePixelArtIcon({ prompt: title });
       if (result.iconDataUri) {
         setSelectedIcon(result.iconDataUri);
-        setCustomIconUrl(result.iconDataUri); // Also set as custom URL so it's displayed as preview
+        setCustomIconUrl(result.iconDataUri); 
         toast({
-          title: "Icon Generated!",
-          description: "A new pixel art icon has been created for your task.",
+          title: "¡Icono Generado!",
+          description: "Se ha creado un nuevo icono pixel art para tu tarea.",
         });
       } else {
-        throw new Error("No icon data URI returned");
+        throw new Error("No se devolvió URI de datos del icono");
       }
     } catch (error) {
-      console.error("Error generating icon:", error);
+      console.error("Error generando icono:", error);
       toast({
-        title: "Icon Generation Failed",
-        description: "Could not generate a pixel art icon. Please try again or select a default icon.",
+        title: "Falló la Generación del Icono",
+        description: "No se pudo generar un icono pixel art. Por favor, inténtalo de nuevo o selecciona un icono predeterminado.",
         variant: "destructive",
       });
     } finally {
@@ -152,33 +152,33 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
       <DialogContent className="sm:max-w-[480px] bg-card rounded-none border-2 border-foreground">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            {taskToEdit ? 'Edit Task' : 'Add New Task'}
+            {taskToEdit ? 'Editar Tarea' : 'Añadir Nueva Tarea'}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="title">Task Title</Label>
+            <Label htmlFor="title">Título de la Tarea</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Water the plants"
+              placeholder="Ej: Regar las plantas"
               required
               className="rounded-none border-foreground"
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="description">Description (Optional)</Label>
+            <Label htmlFor="description">Descripción (Opcional)</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="e.g., Use the green watering can"
+              placeholder="Ej: Usar la regadera verde"
               className="rounded-none border-foreground"
             />
           </div>
           <div className="grid gap-2">
-            <Label>Select Icon</Label>
+            <Label>Seleccionar Icono</Label>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-2">
               {defaultIcons.map((icon, index) => (
                 <button
@@ -191,40 +191,40 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
                       ? 'border-primary ring-2 ring-primary ring-offset-2 bg-primary/10'
                       : 'border-border hover:border-accent'
                   )}
-                  aria-label={`Select icon ${index + 1}`}
+                  aria-label={`Seleccionar icono ${index + 1}`}
                 >
                   <Image
                     src={icon}
-                    alt={`Pixel icon ${index + 1}`}
+                    alt={`Icono pixelado ${index + 1}`}
                     width={48}
                     height={48}
                     className="image-pixelated"
-                    data-ai-hint={defaultIconHints[icon] || "pixel art icon"}
+                    data-ai-hint={defaultIconHints[icon] || "icono pixel art"}
                   />
                 </button>
               ))}
             </div>
-             <Label htmlFor="custom-icon">Or Enter Image URL</Label>
+             <Label htmlFor="custom-icon">O Ingresa URL de Imagen</Label>
              <Input
               id="custom-icon"
               type="url"
               value={customIconUrl}
               onChange={handleCustomIconChange}
-              placeholder="https://... or data:image/..."
+              placeholder="https://... o data:image/..."
               className="rounded-none border-foreground"
             />
              {customIconUrl && selectedIcon === customIconUrl && (
                <div className="mt-2 p-1 border-2 border-primary rounded-none w-fit">
                  <Image
                     src={customIconUrl}
-                    alt="Custom Icon Preview"
+                    alt="Vista Previa Icono Personalizado"
                     width={48}
                     height={48}
                     className="image-pixelated"
                     data-ai-hint="custom pixel art"
                     onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                        const target = e.target as HTMLImageElement;
-                       console.error("Error loading custom icon URL:", target.src);
+                       console.error("Error al cargar URL de icono personalizado:", target.src);
                     }}
                   />
                </div>
@@ -239,17 +239,17 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
               {isGeneratingIcon ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2v0Z"/><path d="M12 12a10 10 0 0 0-4.5 8.13"/><path d="m17.5 6.5-1.5 1.5"/><path d="m6.5 17.5-1.5 1.5"/><path d="m17.5 17.5-1.5-1.5"/><path d="m6.5 6.5-1.5-1.5"/><path d="M12 6.5V5"/><path d="m20 14.2-.5.5M4 9.8l-.5-.5"/><path d="M17.5 12h1.5"/><path d="M5 12h1.5"/></svg> /* Sparkles icon */
+                <Wand2 className="mr-2 h-4 w-4" />
               )}
-              {isGeneratingIcon ? 'Generating...' : 'Generate Icon with AI'}
+              {isGeneratingIcon ? 'Generando...' : 'Generar Icono con IA'}
             </Button>
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="secondary" className="rounded-none border-foreground">Cancel</Button>
+               <Button type="button" variant="secondary" className="rounded-none border-foreground">Cancelar</Button>
             </DialogClose>
             <Button type="submit" className="btn-pixel">
-              {taskToEdit ? 'Save Changes' : 'Add Task'}
+              {taskToEdit ? 'Guardar Cambios' : 'Añadir Tarea'}
             </Button>
           </DialogFooter>
         </form>
@@ -257,4 +257,3 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
     </Dialog>
   );
 }
-

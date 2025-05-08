@@ -1,23 +1,23 @@
 
 'use server';
 /**
- * @fileOverview Generates pixel art icons based on a text prompt.
+ * @fileOverview Genera iconos de pixel art basados en una indicación de texto.
  *
- * - generatePixelArtIcon - A function to generate a pixel art icon.
- * - GeneratePixelArtIconInput - The input type for the generatePixelArtIcon function.
- * - GeneratePixelArtIconOutput - The return type for the generatePixelArtIcon function.
+ * - generatePixelArtIcon - Una función para generar un icono de pixel art.
+ * - GeneratePixelArtIconInput - El tipo de entrada para la función generatePixelArtIcon.
+ * - GeneratePixelArtIconOutput - El tipo de retorno para la función generatePixelArtIcon.
  */
 
 import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
 
 const GeneratePixelArtIconInputSchema = z.object({
-  prompt: z.string().describe('A text prompt to generate a pixel art icon from. This will be used to create a visually simple pixel art representation.'),
+  prompt: z.string().describe('Una indicación de texto para generar un icono de pixel art. Esto se usará para crear una representación de pixel art visualmente simple.'),
 });
 export type GeneratePixelArtIconInput = z.infer<typeof GeneratePixelArtIconInputSchema>;
 
 const GeneratePixelArtIconOutputSchema = z.object({
-  iconDataUri: z.string().describe("The generated pixel art icon as a data URI. Expected format: 'data:image/png;base64,<encoded_data>'."),
+  iconDataUri: z.string().describe("El icono de pixel art generado como un URI de datos. Formato esperado: 'data:image/png;base64,<datos_codificados>'."),
 });
 export type GeneratePixelArtIconOutput = z.infer<typeof GeneratePixelArtIconOutputSchema>;
 
@@ -32,25 +32,22 @@ const generatePixelArtIconFlow = ai.defineFlow(
     outputSchema: GeneratePixelArtIconOutputSchema,
   },
   async (input) => {
-    // Construct a more specific prompt for pixel art generation
-    const imagePrompt = `Generate a small, simple, iconic 4-bit or 8-bit pixel art style image (e.g., 32x32 or 64x64 pixels resolution) suitable as a task icon, based on the theme: "${input.prompt}". The icon should be clear, easily recognizable at small sizes, and use a limited color palette characteristic of pixel art. The background should be transparent or a simple, non-distracting solid color if transparency is not directly supported by the generation. Avoid complex details.`;
+    // Construir una indicación más específica para la generación de pixel art
+    const imagePrompt = `Genera una imagen pequeña, simple e icónica de estilo pixel art de 4 u 8 bits (por ejemplo, resolución de 32x32 o 64x64 píxeles) adecuada como icono de tarea, basada en el tema: "${input.prompt}". El icono debe ser claro, fácilmente reconocible en tamaños pequeños y usar una paleta de colores limitada característica del pixel art. El fondo debe ser transparente o de un color sólido simple que no distraiga si la transparencia no es soportada directamente por la generación. Evita detalles complejos.`;
 
     const {media} = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-exp', // IMPORTANT: Specific model for image generation
+      model: 'googleai/gemini-2.0-flash-exp', // IMPORTANTE: Modelo específico para generación de imágenes
       prompt: imagePrompt,
       config: {
-        responseModalities: ['IMAGE', 'TEXT'], // MUST provide both TEXT and IMAGE
-        // You could add more specific config if the model supports, e.g., targetSize, but let's keep it simple.
-        // Forcing aspect ratio or size here might be model-dependent.
-        // The prompt itself guides the style and simplicity.
+        responseModalities: ['IMAGE', 'TEXT'], // DEBE proporcionar tanto TEXTO como IMAGEN
       },
     });
 
     if (!media || !media.url) {
-      throw new Error('Image generation failed or did not return a media URL.');
+      throw new Error('La generación de imágenes falló o no devolvió una URL de medio.');
     }
     
-    // The media.url is expected to be a data URI like 'data:image/png;base64,....'
+    // Se espera que media.url sea un URI de datos como 'data:image/png;base64,....'
     return { iconDataUri: media.url };
   }
 );

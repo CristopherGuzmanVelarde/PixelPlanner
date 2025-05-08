@@ -30,7 +30,7 @@ const loadTasksFromLocalStorage = (): Task[] => {
     const savedTasks = localStorage.getItem('pixelPlannerTasks');
     return savedTasks ? JSON.parse(savedTasks) : [];
   } catch (error) {
-    console.error("Failed to load tasks from localStorage:", error);
+    console.error("Error al cargar tareas desde localStorage:", error);
     return [];
   }
 };
@@ -42,7 +42,7 @@ const saveTasksToLocalStorage = (tasks: Task[]) => {
   try {
     localStorage.setItem('pixelPlannerTasks', JSON.stringify(tasks));
   } catch (error) {
-    console.error("Failed to save tasks to localStorage:", error);
+    console.error("Error al guardar tareas en localStorage:", error);
   }
 };
 
@@ -145,9 +145,9 @@ export default function Home() {
       <Card className="bg-card/80 backdrop-blur-sm rounded-none shadow-md border-2 border-foreground">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-3xl font-bold text-primary tracking-wide">
-            Pixel Planner
+            Planificador Pixelado
           </CardTitle>
-           <p className="text-muted-foreground">Your daily tasks, pixelated.</p>
+           <p className="text-muted-foreground">Tus tareas diarias, pixeladas.</p>
         </CardHeader>
         <Separator className="mb-4 border-t-2 border-foreground"/>
         <CardContent>
@@ -161,7 +161,7 @@ export default function Home() {
               />
             </>
            ) : (
-             <p className="text-center text-muted-foreground p-8">Loading tasks...</p>
+             <p className="text-center text-muted-foreground p-8">Cargando tareas...</p>
            )}
         </CardContent>
       </Card>
@@ -177,9 +177,10 @@ export default function Home() {
           <Button
             onClick={handleOpenAddTaskDialog}
             className={cn("fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg btn-pixel")}
+            aria-label="Añadir Nueva Tarea"
           >
             <Plus className="h-6 w-6" />
-            <span className="sr-only">Add New Task</span>
+            <span className="sr-only">Añadir Nueva Tarea</span>
           </Button>
         </>
       )}
@@ -187,14 +188,14 @@ export default function Home() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="rounded-none border-2 border-foreground">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>¿Estás completamente seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the task.
+              Esta acción no se puede deshacer. Esto eliminará permanentemente la tarea.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelDeleteTask} className="rounded-none border-foreground">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteTask} className="btn-pixel bg-destructive hover:bg-destructive/90 border-destructive-foreground">Delete</AlertDialogAction>
+            <AlertDialogCancel onClick={cancelDeleteTask} className="rounded-none border-foreground">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteTask} className="btn-pixel bg-destructive hover:bg-destructive/90 border-destructive-foreground">Eliminar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

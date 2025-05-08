@@ -13,7 +13,7 @@ interface TaskListProps {
 
 export function TaskList({ tasks, onToggleComplete, onDeleteRequest, onEditRequest }: TaskListProps) {
   if (!tasks.length) {
-    return <p className="text-center text-muted-foreground mt-8">No tasks yet! Add one to get started.</p>;
+    return <p className="text-center text-muted-foreground mt-8">¡No hay tareas aún! Añade una para empezar.</p>;
   }
 
   return (

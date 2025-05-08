@@ -63,14 +63,14 @@ export function TaskItem({ task, onToggleComplete, onDeleteRequest, onEditReques
           id={`label-${task.id}`}
           className="sr-only"
         >
-          Mark {task.title} as {task.completed ? 'incomplete' : 'complete'}
+          Marcar {task.title} como {task.completed ? 'incompleta' : 'completa'}
         </Label>
         <Button
           variant="outline"
           size="icon"
           className="h-8 w-8 rounded-none border-foreground hover:bg-accent/80"
           onClick={() => onEditRequest(task)}
-          aria-label={`Edit task ${task.title}`}
+          aria-label={`Editar tarea ${task.title}`}
         >
           <Edit3 className="h-4 w-4" />
         </Button>
@@ -79,7 +79,7 @@ export function TaskItem({ task, onToggleComplete, onDeleteRequest, onEditReques
           size="icon"
           className="h-8 w-8 rounded-none border-destructive-foreground text-destructive hover:bg-destructive/10 hover:text-destructive"
           onClick={() => onDeleteRequest(task.id)}
-          aria-label={`Delete task ${task.title}`}
+          aria-label={`Eliminar tarea ${task.title}`}
         >
           <Trash2 className="h-4 w-4" />
         </Button>

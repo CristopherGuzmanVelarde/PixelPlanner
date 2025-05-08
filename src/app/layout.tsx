@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Pixel Planner',
-  description: 'Plan your day, pixel style!',
+  title: 'Planificador Pixelado',
+  description: '¡Planifica tu día, al estilo pixel!',
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
         className={cn(
           geistSans.variable,
