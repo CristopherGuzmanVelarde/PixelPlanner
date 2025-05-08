@@ -1,27 +1,26 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Task } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus } from 'lucide-react';
 import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog"
-import { cn } from '@/lib/utils'; // Import cn
+import { cn } from '@/lib/utils';
 
 interface AddTaskFormProps {
-  onAddTask: (newTask: Omit<Task, 'id' | 'completed'>) => void;
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  onSaveTask: (taskData: { title: string; description?: string; iconUrl: string }) => void;
+  taskToEdit: Task | null;
 }
 
 // Placeholder pixel art icons
@@ -34,64 +33,67 @@ const defaultIcons = [
   "https://picsum.photos/seed/pixel6/64/64",
 ];
 
-export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
+export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState(defaultIcons[0]);
   const [customIconUrl, setCustomIconUrl] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (taskToEdit) {
+        setTitle(taskToEdit.title);
+        setDescription(taskToEdit.description || '');
+        setSelectedIcon(taskToEdit.iconUrl);
+        if (!defaultIcons.includes(taskToEdit.iconUrl)) {
+          setCustomIconUrl(taskToEdit.iconUrl);
+        } else {
+          setCustomIconUrl('');
+        }
+      } else {
+        // Reset for "add new" mode
+        setTitle('');
+        setDescription('');
+        setSelectedIcon(defaultIcons[0]);
+        setCustomIconUrl('');
+      }
+    }
+  }, [isOpen, taskToEdit]);
 
   const handleIconSelect = (iconUrl: string) => {
     setSelectedIcon(iconUrl);
-    setCustomIconUrl(''); // Clear custom URL if default is selected
+    setCustomIconUrl(''); 
   };
 
   const handleCustomIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value;
     setCustomIconUrl(url);
-    // Basic validation for URL format (optional)
-    // Allow http, https, and data URIs
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image')) {
         setSelectedIcon(url);
     } else if (url === '') {
-       setSelectedIcon(defaultIcons[0]); // Reset to default if empty
-    } else {
-        // Optionally handle invalid URLs, maybe keep the previous icon?
-        // For now, it just won't update selectedIcon if format is not recognized
+       setSelectedIcon(defaultIcons[0]);
     }
-    // Potentially add more robust URL validation or image loading preview
   };
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return; // Basic validation
+    if (!title.trim()) return;
 
-    onAddTask({
+    onSaveTask({
       title: title.trim(),
       description: description.trim() || undefined,
       iconUrl: selectedIcon,
     });
-
-    // Reset form
-    setTitle('');
-    setDescription('');
-    setSelectedIcon(defaultIcons[0]);
-    setCustomIconUrl('');
-    setIsDialogOpen(false); // Close dialog on successful submit
+    onOpenChange(false); // Close dialog on successful submit
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button className={cn("fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg btn-pixel")}> {/* Use btn-pixel style */}
-          <Plus className="h-6 w-6" />
-          <span className="sr-only">Add New Task</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px] bg-card rounded-none border-2 border-foreground"> {/* Updated for pixel style */}
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[480px] bg-card rounded-none border-2 border-foreground">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Add New Task</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            {taskToEdit ? 'Edit Task' : 'Add New Task'}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
@@ -102,7 +104,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Water the plants"
               required
-              className="rounded-none border-foreground" /* Updated for pixel style */
+              className="rounded-none border-foreground"
             />
           </div>
           <div className="grid gap-2">
@@ -112,7 +114,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g., Use the green watering can"
-              className="rounded-none border-foreground" /* Updated for pixel style */
+              className="rounded-none border-foreground"
             />
           </div>
           <div className="grid gap-2">
@@ -128,7 +130,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
                     selectedIcon === icon
                       ? 'border-primary ring-2 ring-primary ring-offset-2'
                       : 'border-border hover:border-accent'
-                  )} /* Updated for pixel style */
+                  )}
                   aria-label={`Select icon ${index + 1}`}
                 >
                   <Image
@@ -149,10 +151,10 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
               value={customIconUrl}
               onChange={handleCustomIconChange}
               placeholder="https://... or data:image/..."
-              className="rounded-none border-foreground" /* Updated for pixel style */
+              className="rounded-none border-foreground"
             />
              {customIconUrl && selectedIcon === customIconUrl && (
-               <div className="mt-2 p-1 border-2 border-primary rounded-none w-fit"> {/* Updated for pixel style */}
+               <div className="mt-2 p-1 border-2 border-primary rounded-none w-fit">
                  <Image
                     src={customIconUrl}
                     alt="Custom Icon Preview"
@@ -161,21 +163,17 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
                     className="image-pixelated"
                     data-ai-hint="custom pixel art"
                     onError={(e) => {
-                      // Handle image loading error, maybe show a placeholder or default
                        console.error("Error loading custom icon:", e);
-                       // Optionally reset to default if error:
-                       // setSelectedIcon(defaultIcons[0]);
-                       // setCustomIconUrl('');
                     }}
                   />
                </div>
              )}
           </div>
           <DialogFooter>
-            <DialogClose asChild> {/* Add asChild prop */}
-               <Button type="button" variant="secondary" className="rounded-none border-foreground">Cancel</Button> {/* REMOVED asChild prop */}
-            </DialogClose>
-            <Button type="submit" className="btn-pixel">Add Task</Button> {/* Use btn-pixel style */}
+            <Button type="button" variant="secondary" className="rounded-none border-foreground" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="submit" className="btn-pixel">
+              {taskToEdit ? 'Save Changes' : 'Add Task'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

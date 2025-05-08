@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import { Toaster } from "@/components/ui/toaster"; // Import Toaster
+import { Toaster } from "@/components/ui/toaster";
+import { Header } from '@/components/layout/Header'; // Import Header
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Pixel Planner', // Updated Title
-  description: 'Plan your day, pixel style!', // Updated Description
+  title: 'Pixel Planner',
+  description: 'Plan your day, pixel style!',
 };
 
 export default function RootLayout({
@@ -30,13 +31,14 @@ export default function RootLayout({
         className={cn(
           geistSans.variable,
           geistMono.variable,
-          'antialiased font-sans' // Use sans font by default
+          'antialiased font-sans'
         )}
       >
-        <main vaul-drawer-wrapper="" className="min-h-screen bg-background">
+        <Header />
+        <main vaul-drawer-wrapper="" className="min-h-[calc(100vh-58px)] bg-background"> {/* Adjusted for header height approx 56px + 2px border */}
           {children}
         </main>
-        <Toaster /> {/* Add Toaster component */}
+        <Toaster />
       </body>
     </html>
   );

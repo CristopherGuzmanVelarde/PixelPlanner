@@ -1,4 +1,4 @@
-"use client"; // Required for useState and event handlers
+"use client";
 
 import { useState, useEffect } from 'react';
 import type { Task } from '@/types';
@@ -6,14 +6,25 @@ import { TaskList } from '@/components/task-list';
 import { AddTaskForm } from '@/components/add-task-form';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { cn } from '@/lib/utils';
 
-// Helper to generate unique IDs (replace with a robust library like uuid in a real app)
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
-// Function to safely get data from localStorage
 const loadTasksFromLocalStorage = (): Task[] => {
   if (typeof window === 'undefined') {
-    return []; // Return empty array during SSR
+    return [];
   }
   try {
     const savedTasks = localStorage.getItem('pixelPlannerTasks');
@@ -24,10 +35,9 @@ const loadTasksFromLocalStorage = (): Task[] => {
   }
 };
 
-// Function to safely save data to localStorage
 const saveTasksToLocalStorage = (tasks: Task[]) => {
    if (typeof window === 'undefined') {
-    return; // Do nothing during SSR
+    return;
   }
   try {
     localStorage.setItem('pixelPlannerTasks', JSON.stringify(tasks));
@@ -36,72 +46,158 @@ const saveTasksToLocalStorage = (tasks: Task[]) => {
   }
 };
 
-
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [isClient, setIsClient] = useState(false); // State to track client-side mounting
+  const [isClient, setIsClient] = useState(false);
 
-  // Load tasks from localStorage only on the client side after mount
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [taskToDeleteId, setTaskToDeleteId] = useState<string | null>(null);
+
   useEffect(() => {
-    setIsClient(true); // Indicate component has mounted client-side
+    setIsClient(true);
     setTasks(loadTasksFromLocalStorage());
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []);
 
-  // Save tasks to localStorage whenever tasks state changes (only on client)
   useEffect(() => {
-    if (isClient) { // Only save if running on the client
+    if (isClient) {
       saveTasksToLocalStorage(tasks);
     }
   }, [tasks, isClient]);
 
-  const handleAddTask = (newTaskData: Omit<Task, 'id' | 'completed'>) => {
-    const newTask: Task = {
-      ...newTaskData,
-      id: generateId(),
-      completed: false,
-    };
-    setTasks((prevTasks) => [newTask, ...prevTasks]); // Add new task to the beginning
+  const handleOpenAddTaskDialog = () => {
+    setTaskToEdit(null);
+    setIsFormDialogOpen(true);
+  };
+
+  const handleOpenEditTaskDialog = (task: Task) => {
+    setTaskToEdit(task);
+    setIsFormDialogOpen(true);
+  };
+
+  const handleFormDialogValidOpenChange = (open: boolean) => {
+    setIsFormDialogOpen(open);
+    if (!open) {
+      setTaskToEdit(null); // Reset taskToEdit when dialog is closed
+    }
+  }
+
+  const handleSaveTask = (taskData: { title: string; description?: string; iconUrl: string }) => {
+    if (taskToEdit) {
+      // Edit existing task
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.id === taskToEdit.id
+            ? { ...taskToEdit, ...taskData }
+            : task
+        )
+      );
+    } else {
+      // Add new task
+      const newTask: Task = {
+        ...taskData,
+        id: generateId(),
+        completed: false,
+      };
+      setTasks(prevTasks => [newTask, ...prevTasks]);
+    }
+    setIsFormDialogOpen(false);
+    setTaskToEdit(null);
   };
 
   const handleToggleComplete = (id: string) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
         task.id === id ? { ...task, completed: !task.completed } : task
       )
     );
   };
 
-  // Sort tasks: incomplete first, then complete
+  const handleDeleteRequest = (id: string) => {
+    setTaskToDeleteId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteTask = () => {
+    if (taskToDeleteId) {
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskToDeleteId));
+    }
+    setIsDeleteDialogOpen(false);
+    setTaskToDeleteId(null);
+  };
+
+  const cancelDeleteTask = () => {
+    setIsDeleteDialogOpen(false);
+    setTaskToDeleteId(null);
+  };
+  
   const sortedTasks = [...tasks].sort((a, b) => {
       if (a.completed === b.completed) {
-          return 0; // Keep original order if same completion status
+          return 0;
       }
-      return a.completed ? 1 : -1; // Incomplete tasks come first
+      return a.completed ? 1 : -1;
   });
-
 
   return (
     <div className="container mx-auto max-w-2xl py-8 px-4">
-      <Card className="bg-card/80 backdrop-blur-sm rounded-none shadow-md border-2 border-foreground"> {/* Updated for pixel style */}
+      <Card className="bg-card/80 backdrop-blur-sm rounded-none shadow-md border-2 border-foreground">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-3xl font-bold text-primary tracking-wide">
             Pixel Planner
           </CardTitle>
            <p className="text-muted-foreground">Your daily tasks, pixelated.</p>
         </CardHeader>
-        <Separator className="mb-4 border-t-2 border-foreground"/> {/* Thicker separator */}
+        <Separator className="mb-4 border-t-2 border-foreground"/>
         <CardContent>
-           {/* Only render TaskList and AddTaskForm on the client */}
            {isClient ? (
             <>
-              <TaskList tasks={sortedTasks} onToggleComplete={handleToggleComplete} />
-              <AddTaskForm onAddTask={handleAddTask} />
+              <TaskList
+                tasks={sortedTasks}
+                onToggleComplete={handleToggleComplete}
+                onDeleteRequest={handleDeleteRequest}
+                onEditRequest={handleOpenEditTaskDialog}
+              />
             </>
            ) : (
-             <p className="text-center text-muted-foreground p-8">Loading tasks...</p> // Placeholder during SSR/initial load
+             <p className="text-center text-muted-foreground p-8">Loading tasks...</p>
            )}
         </CardContent>
       </Card>
+
+      {isClient && (
+        <>
+          <AddTaskForm
+            isOpen={isFormDialogOpen}
+            onOpenChange={handleFormDialogValidOpenChange}
+            onSaveTask={handleSaveTask}
+            taskToEdit={taskToEdit}
+          />
+          <Button
+            onClick={handleOpenAddTaskDialog}
+            className={cn("fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg btn-pixel")}
+          >
+            <Plus className="h-6 w-6" />
+            <span className="sr-only">Add New Task</span>
+          </Button>
+        </>
+      )}
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="rounded-none border-2 border-foreground">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the task.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDeleteTask} className="rounded-none border-foreground">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteTask} className="btn-pixel bg-destructive hover:bg-destructive/90 border-destructive-foreground">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

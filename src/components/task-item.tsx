@@ -5,14 +5,18 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Trash2, Edit3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TaskItemProps {
   task: Task;
   onToggleComplete: (id: string) => void;
+  onDeleteRequest: (id: string) => void;
+  onEditRequest: (task: Task) => void;
 }
 
-export function TaskItem({ task, onToggleComplete }: TaskItemProps) {
+export function TaskItem({ task, onToggleComplete, onDeleteRequest, onEditRequest }: TaskItemProps) {
   const handleCheckedChange = () => {
     onToggleComplete(task.id);
   };
@@ -20,7 +24,7 @@ export function TaskItem({ task, onToggleComplete }: TaskItemProps) {
   return (
     <Card
       className={cn(
-        'flex items-start space-x-4 p-4 rounded-none transition-opacity duration-300 border-foreground', // Use rounded-none for pixel feel, added border
+        'flex items-start space-x-4 p-4 rounded-none transition-opacity duration-300 border-foreground',
         task.completed ? 'opacity-50 bg-muted' : 'opacity-100'
       )}
     >
@@ -28,9 +32,9 @@ export function TaskItem({ task, onToggleComplete }: TaskItemProps) {
         <Image
           src={task.iconUrl}
           alt={task.title}
-          width={48} // Slightly larger for pixel art
+          width={48}
           height={48}
-          className="image-pixelated rounded-none border border-border" // Use rounded-none
+          className="image-pixelated rounded-none border border-border"
           data-ai-hint="pixel art icon"
         />
       </div>
@@ -46,21 +50,39 @@ export function TaskItem({ task, onToggleComplete }: TaskItemProps) {
           </CardDescription>
         )}
       </div>
-      <div className="flex items-center space-x-2 self-center ml-auto pl-4">
-         <Checkbox
-            id={`task-${task.id}`}
-            checked={task.completed}
-            onCheckedChange={handleCheckedChange}
-            aria-labelledby={`label-${task.id}`}
-            className="size-5 rounded-none border-foreground" // Use rounded-none, added border
-          />
-          <Label
-            htmlFor={`task-${task.id}`}
-            id={`label-${task.id}`}
-            className="sr-only" // Hide label visually but keep for accessibility
-          >
-            Mark {task.title} as {task.completed ? 'incomplete' : 'complete'}
-          </Label>
+      <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 self-center ml-auto pl-2">
+        <Checkbox
+          id={`task-${task.id}`}
+          checked={task.completed}
+          onCheckedChange={handleCheckedChange}
+          aria-labelledby={`label-${task.id}`}
+          className="size-5 rounded-none border-foreground"
+        />
+        <Label
+          htmlFor={`task-${task.id}`}
+          id={`label-${task.id}`}
+          className="sr-only"
+        >
+          Mark {task.title} as {task.completed ? 'incomplete' : 'complete'}
+        </Label>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8 rounded-none border-foreground hover:bg-accent/80"
+          onClick={() => onEditRequest(task)}
+          aria-label={`Edit task ${task.title}`}
+        >
+          <Edit3 className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8 rounded-none border-destructive-foreground text-destructive hover:bg-destructive/10 hover:text-destructive"
+          onClick={() => onDeleteRequest(task.id)}
+          aria-label={`Delete task ${task.title}`}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </div>
     </Card>
   );
