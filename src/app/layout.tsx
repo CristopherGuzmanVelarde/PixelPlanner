@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Planificador Pixelado',
+  title: 'PixelPlanner',
   description: '¡Planifica tu día, al estilo pixel!',
 };
 
@@ -43,3 +43,4 @@ export default function RootLayout({
     </html>
   );
 }
+
