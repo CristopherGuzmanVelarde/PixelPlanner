@@ -6,11 +6,11 @@ from 'react';
 import type { Task } from '@/types';
 import { TaskList } from '@/components/task-list';
 import { AddTaskForm } from '@/components/add-task-form';
-import { TaskReportModal } from '@/components/task-report-modal'; // Nueva importación
+import { TaskReportModal } from '@/components/task-report-modal';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, Archive, Settings, Palette, FileText } from 'lucide-react'; // Añadido FileText
+import { Plus, ListChecks, Archive, Settings, Palette, FileText } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,7 +65,7 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false); // Estado para el modal de reporte
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [taskToDeleteId, setTaskToDeleteId] = useState<string | null>(null);
@@ -190,18 +190,18 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl py-8 px-4">
-      <Card className="bg-card/90 backdrop-blur-sm rounded-none shadow-lg border-2 border-foreground">
+    <div className="container mx-auto max-w-3xl py-4 sm:py-8 px-2 sm:px-4 h-full">
+      <Card className="bg-card/90 backdrop-blur-sm rounded-none shadow-lg border-2 border-foreground h-full flex flex-col">
         <CardHeader className="text-center pb-4 relative">
-          <CardTitle className="text-4xl font-bold text-primary tracking-wider">
+          <CardTitle className="text-3xl sm:text-4xl font-bold text-primary tracking-wider">
             PixelPlanner
           </CardTitle>
-           <CardDescription className="text-muted-foreground text-sm">Tus tareas diarias, ¡con un toque pixelado!</CardDescription>
-          <div className="absolute top-4 right-4">
+           <CardDescription className="text-xs sm:text-sm text-muted-foreground">Tus tareas diarias, ¡con un toque pixelado!</CardDescription>
+          <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-none border-foreground">
-                  <Settings className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="rounded-none border-foreground h-8 w-8 sm:h-10 sm:w-10">
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span className="sr-only">Opciones</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -230,17 +230,17 @@ export default function Home() {
             </DropdownMenu>
           </div>
         </CardHeader>
-        <Separator className="mb-6 border-t-2 border-foreground"/>
-        <CardContent>
-          <div className="mb-4">
+        <Separator className="mb-4 sm:mb-6 border-t-2 border-foreground"/>
+        <CardContent className="flex flex-col flex-grow overflow-hidden p-2 sm:p-6">
+          <div className="mb-3 sm:mb-4">
             <div className="flex justify-between items-center mb-1">
-              <p className="text-sm text-muted-foreground">Progreso:</p>
-              <p className="text-sm font-semibold text-primary">{`${completedTasksCount} / ${totalTasksCount} completadas`}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Progreso:</p>
+              <p className="text-xs sm:text-sm font-semibold text-primary">{`${completedTasksCount} / ${totalTasksCount} completadas`}</p>
             </div>
-            <Progress value={progressPercentage} className="h-3 rounded-none bg-muted border border-foreground" indicatorClassName="bg-primary" />
+            <Progress value={progressPercentage} className="h-2 sm:h-3 rounded-none bg-muted border border-foreground" indicatorClassName="bg-primary" />
           </div>
 
-           <div className="flex flex-col sm:flex-row gap-2 mb-6">
+           <div className="flex flex-col sm:flex-row gap-2 mb-4 sm:mb-6">
             <input
               type="text"
               placeholder="Buscar tareas..."
@@ -248,41 +248,47 @@ export default function Home() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-grow p-2 border-2 border-input bg-background rounded-none focus:ring-2 focus:ring-ring focus:border-ring text-sm"
             />
-            <div className="flex gap-1">
+            <div className="flex gap-1 sm:gap-2">
               {(["all", "active", "completed"] as FilterType[]).map(filterType => (
                 <Button
                   key={filterType}
                   variant={filter === filterType ? "default" : "outline"}
                   onClick={() => setFilter(filterType)}
-                  className={cn("capitalize flex-1 sm:flex-initial rounded-none border-foreground text-xs sm:text-sm", filter === filterType && "btn-pixel")}
+                  className={cn("capitalize flex-1 sm:flex-initial rounded-none border-foreground text-xs px-2 sm:px-3 py-1 h-auto sm:text-sm", filter === filterType && "btn-pixel")}
                 >
                   {filterType === "all" ? "Todas" : filterType === "active" ? "Activas" : "Completas"}
                 </Button>
               ))}
             </div>
           </div>
-
-           {isClient ? (
-            <>
-              <TaskList
-                tasks={sortedTasks}
-                onToggleComplete={handleToggleComplete}
-                onDeleteRequest={handleDeleteRequest}
-                onEditRequest={handleOpenEditTaskDialog}
-              />
-              {filteredTasks.length === 0 && searchTerm && (
-                <p className="text-center text-muted-foreground mt-8">No se encontraron tareas con "{searchTerm}".</p>
-              )}
-              {filteredTasks.length === 0 && !searchTerm && tasks.length > 0 && (
-                 <p className="text-center text-muted-foreground mt-8">No hay tareas que coincidan con el filtro seleccionado.</p>
-              )}
-               {tasks.length === 0 && !searchTerm && (
-                <p className="text-center text-muted-foreground mt-8">¡No hay tareas aún! Añade una para empezar.</p>
-              )}
-            </>
-           ) : (
-             <p className="text-center text-muted-foreground p-8">Cargando tareas...</p>
-           )}
+          
+          <div className="flex flex-col flex-grow overflow-hidden min-h-0">
+            {isClient ? (
+              <>
+                {sortedTasks.length > 0 ? (
+                  <TaskList
+                    tasks={sortedTasks}
+                    onToggleComplete={handleToggleComplete}
+                    onDeleteRequest={handleDeleteRequest}
+                    onEditRequest={handleOpenEditTaskDialog}
+                    className="flex-grow" 
+                  />
+                ) : (
+                  <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
+                    {tasks.length === 0 ? (
+                      <p className="text-muted-foreground">¡No hay tareas aún! Añade una para empezar.</p>
+                    ) : searchTerm ? (
+                      <p className="text-muted-foreground">No se encontraron tareas con "{searchTerm}".</p>
+                    ) : (
+                      <p className="text-muted-foreground">No hay tareas que coincidan con el filtro seleccionado.</p>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-center text-muted-foreground p-8 flex-grow flex items-center justify-center">Cargando tareas...</p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -301,11 +307,11 @@ export default function Home() {
           />
           <Button
             onClick={handleOpenAddTaskDialog}
-            className={cn("fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-lg btn-pixel border-2 border-primary-foreground")}
+            className={cn("fixed bottom-4 right-4 sm:bottom-6 sm:right-6 rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-lg btn-pixel border-2 border-primary-foreground")}
             aria-label="Añadir Nueva Tarea"
             title="Añadir Nueva Tarea"
           >
-            <Plus className="h-7 w-7" />
+            <Plus className="h-6 w-6 sm:h-7 sm:w-7" />
             <span className="sr-only">Añadir Nueva Tarea</span>
           </Button>
         </>
