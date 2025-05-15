@@ -10,7 +10,7 @@ import { TaskReportModal } from '@/components/task-report-modal';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, Archive, Settings, Palette, FileText, Info, Loader2 } from 'lucide-react';
+import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon } from 'lucide-react'; // Added Sun, Moon
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,6 +66,7 @@ const saveTasksToLocalStorage = (tasks: Task[]) => {
 };
 
 type FilterType = "all" | "completed" | "active";
+type Theme = "light" | "dark";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -77,11 +78,22 @@ export default function Home() {
   const [taskToDeleteId, setTaskToDeleteId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [theme, setTheme] = useState<Theme>('light');
   const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
     setTasks(loadTasksFromLocalStorage());
+
+    // Initialize theme
+    const storedTheme = localStorage.getItem('pixelPlannerTheme') as Theme | null;
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (storedTheme) {
+      setTheme(storedTheme);
+    } else {
+      setTheme(systemPrefersDark ? 'dark' : 'light');
+    }
   }, []);
 
   useEffect(() => {
@@ -89,6 +101,21 @@ export default function Home() {
       saveTasksToLocalStorage(tasks);
     }
   }, [tasks, isClient]);
+
+  useEffect(() => {
+    if (isClient) {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      localStorage.setItem('pixelPlannerTheme', theme);
+    }
+  }, [theme, isClient]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
 
   const handleOpenAddTaskDialog = () => {
     setTaskToEdit(null);
@@ -238,14 +265,14 @@ export default function Home() {
                   <span>Ver Reporte de Tiempo</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator/>
+                <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer hover:!bg-accent/80 focus:!bg-accent/90">
+                  {theme === 'light' ? <Moon className="mr-2 h-4 w-4" /> : <Sun className="mr-2 h-4 w-4" />}
+                  <span>Cambiar a Tema {theme === 'light' ? 'Oscuro' : 'Claro'}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator/>
                 <DropdownMenuItem onClick={clearAllTasks} className="text-destructive cursor-pointer hover:!bg-destructive/10 hover:!text-destructive focus:!bg-destructive/20 focus:!text-destructive">
                   <Archive className="mr-2 h-4 w-4" />
                   <span>Eliminar Todas las Tareas</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator/>
-                 <DropdownMenuItem disabled className="cursor-not-allowed opacity-50">
-                  <Palette className="mr-2 h-4 w-4" />
-                  <span>Cambiar Tema (Próximamente)</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -378,3 +405,4 @@ export default function Home() {
     </TooltipProvider>
   );
 }
+
