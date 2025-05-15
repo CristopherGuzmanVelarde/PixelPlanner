@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -16,18 +17,18 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      // Add the new hostname here
       {
         protocol: 'https',
         hostname: 'images.app.goo.gl',
         port: '',
         pathname: '/**',
       },
-      // Allow any https image source (less secure, use if necessary)
-      // {
-      //   protocol: 'https',
-      //   hostname: '**',
-      // },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
