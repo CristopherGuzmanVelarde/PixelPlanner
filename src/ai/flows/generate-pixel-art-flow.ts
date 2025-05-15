@@ -12,7 +12,7 @@ import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
 
 const GeneratePixelArtIconInputSchema = z.object({
-  prompt: z.string().describe('Una indicación de texto para generar un icono de pixel art. Esto se usará para crear una representación de pixel art visualmente simple.'),
+  prompt: z.string().describe('Una indicación de texto concisa que describe el tema principal del icono de pixel art. Por ejemplo: "libro", "manzana roja", "cohete espacial".'),
 });
 export type GeneratePixelArtIconInput = z.infer<typeof GeneratePixelArtIconInputSchema>;
 
@@ -32,15 +32,15 @@ const generatePixelArtIconFlow = ai.defineFlow(
     outputSchema: GeneratePixelArtIconOutputSchema,
   },
   async (input) => {
-    // Construir una indicación más específica para la generación de pixel art
-    const imagePrompt = `Genera una imagen pequeña, simple e icónica de estilo pixel art de 4 u 8 bits (por ejemplo, resolución de 32x32 o 64x64 píxeles) adecuada como icono de tarea, basada en el tema: "${input.prompt}". El icono debe ser claro, fácilmente reconocible en tamaños pequeños y usar una paleta de colores limitada característica del pixel art. El fondo debe ser transparente o de un color sólido simple que no distraiga si la transparencia no es soportada directamente por la generación. Evita detalles complejos. El estilo debe ser estrictamente pixelado, sin anti-aliasing ni suavizado.`;
+    // Prompt refinado para ser más directo y específico.
+    const imagePrompt = `Crea un icono pixel art de 32x32 píxeles para una tarea con el tema: "${input.prompt}". El estilo debe ser simple, claro, icónico, evocando el arte de 8 bits. Utiliza una paleta de colores limitada y asegúrate de que el fondo sea transparente. El diseño debe ser estrictamente pixelado, sin anti-aliasing ni efectos de suavizado. Debe ser fácilmente reconocible como un icono pequeño.`;
 
     const {media} = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-exp', // IMPORTANTE: Modelo específico para generación de imágenes
+      model: 'googleai/gemini-2.0-flash-exp', 
       prompt: imagePrompt,
       config: {
-        responseModalities: ['IMAGE', 'TEXT'], // DEBE proporcionar tanto TEXTO como IMAGEN
-         safetySettings: [ // Added safety settings to be less restrictive for creative content
+        responseModalities: ['IMAGE', 'TEXT'], 
+         safetySettings: [ 
           {
             category: 'HARM_CATEGORY_HATE_SPEECH',
             threshold: 'BLOCK_ONLY_HIGH',
@@ -62,10 +62,10 @@ const generatePixelArtIconFlow = ai.defineFlow(
     });
 
     if (!media || !media.url) {
-      throw new Error('La generación de imágenes falló o no devolvió una URL de medio.');
+      console.error('Error en la respuesta de generación de imagen:', media);
+      throw new Error('La generación de imágenes falló o no devolvió una URL de medio válida.');
     }
     
-    // Se espera que media.url sea un URI de datos como 'data:image/png;base64,....'
     return { iconDataUri: media.url };
   }
 );

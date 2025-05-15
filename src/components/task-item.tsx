@@ -3,11 +3,11 @@
 
 import type { Task } from '@/types';
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'; // CardContent removed as it's not directly used
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit3, CalendarDays, Clock } from 'lucide-react'; // Added CalendarDays, Clock
+import { Trash2, Edit3, CalendarDays, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -31,17 +31,20 @@ export function TaskItem({ task, onToggleComplete, onDeleteRequest, onEditReques
   return (
     <Card
       className={cn(
-        'flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-none transition-opacity duration-300 border-foreground', // Adjusted padding and spacing
-        task.completed ? 'opacity-60 bg-muted/50' : 'opacity-100 bg-card' // Slightly different opacity and bg for completed
+        'flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-none transition-all duration-200 border-2 border-foreground', 
+        task.completed 
+          ? 'opacity-60 bg-muted/50 hover:bg-muted/70 hover:border-foreground/70' 
+          : 'opacity-100 bg-card hover:bg-card/90 hover:border-accent hover:shadow-[1px_1px_0px_0px_hsl(var(--accent))]',
+        'group' // Added group for potential future group-hover states if needed
       )}
     >
       <div className="flex-shrink-0 pt-1">
         <Image
           src={task.iconUrl}
           alt={task.title}
-          width={48} // Intrinsic width for next/image
-          height={48} // Intrinsic height for next/image
-          className="image-pixelated rounded-none border border-border w-10 h-10 sm:w-12 sm:h-12 object-contain" // CSS controlled size
+          width={48} 
+          height={48} 
+          className="image-pixelated rounded-none border border-border w-10 h-10 sm:w-12 sm:h-12 object-contain" 
           data-ai-hint="pixel art icon"
         />
       </div>
@@ -82,7 +85,7 @@ export function TaskItem({ task, onToggleComplete, onDeleteRequest, onEditReques
           checked={task.completed}
           onCheckedChange={handleCheckedChange}
           aria-labelledby={`label-${task.id}`}
-          className="size-5 sm:size-5 rounded-none border-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary-foreground"
+          className="size-5 sm:size-5 rounded-none border-2 border-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary-foreground focus:ring-ring focus:ring-offset-1"
         />
         <Label
           htmlFor={`task-${task.id}`}
@@ -94,7 +97,7 @@ export function TaskItem({ task, onToggleComplete, onDeleteRequest, onEditReques
         <Button
           variant="outline"
           size="icon"
-          className="h-7 w-7 sm:h-8 sm:w-8 rounded-none border-foreground hover:bg-accent/80"
+          className="h-7 w-7 sm:h-8 sm:w-8 rounded-none border-2 border-foreground hover:bg-accent/80 hover:border-accent"
           onClick={() => onEditRequest(task)}
           aria-label={`Editar tarea ${task.title}`}
         >
@@ -103,7 +106,7 @@ export function TaskItem({ task, onToggleComplete, onDeleteRequest, onEditReques
         <Button
           variant="outline"
           size="icon"
-          className="h-7 w-7 sm:h-8 sm:w-8 rounded-none border-destructive-foreground text-destructive hover:bg-destructive/10 hover:text-destructive"
+          className="h-7 w-7 sm:h-8 sm:w-8 rounded-none border-2 border-destructive text-destructive hover:bg-destructive/10 hover:border-destructive/70"
           onClick={() => onDeleteRequest(task.id)}
           aria-label={`Eliminar tarea ${task.title}`}
         >
