@@ -17,34 +17,33 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import { cn } from '@/lib/utils';
-import { generatePixelArtIcon } from '@/ai/flows/generate-pixel-art-flow';
+import { generatePixelArtIconFromPrompt } from '@/ai/flows/generate-pixel-art-flow';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Wand2 } from 'lucide-react'; // Replaced Sparkles with Wand2 for better semantics
+import { Loader2, Wand2 } from 'lucide-react';
 
 interface AddTaskFormProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSaveTask: (taskData: { title: string; description?: string; iconUrl: string }) => void;
+  onSaveTask: (taskData: { title: string; description?: string; iconUrl: string; category?: string; dueDate?: string; timeSpent?: number }) => void;
   taskToEdit: Task | null;
 }
 
-// Placeholder pixel art icons
 const defaultIcons = [
-  "https://picsum.photos/seed/comida/64/64",
-  "https://picsum.photos/seed/trabajo/64/64",
-  "https://picsum.photos/seed/hobby/64/64",
-  "https://picsum.photos/seed/salud/64/64",
-  "https://picsum.photos/seed/hogar/64/64",
-  "https://picsum.photos/seed/social/64/64",
+  "https://placehold.co/64x64.png",
+  "https://placehold.co/64x64.png",
+  "https://placehold.co/64x64.png",
+  "https://placehold.co/64x64.png",
+  "https://placehold.co/64x64.png",
+  "https://placehold.co/64x64.png",
 ];
 
-const defaultIconHints: Record<string, string> = {
-  "https://picsum.photos/seed/comida/64/64": "comida fruta",
-  "https://picsum.photos/seed/trabajo/64/64": "trabajo computadora",
-  "https://picsum.photos/seed/hobby/64/64": "hobby libro",
-  "https://picsum.photos/seed/salud/64/64": "salud corazon",
-  "https://picsum.photos/seed/hogar/64/64": "hogar casa",
-  "https://picsum.photos/seed/social/64/64": "social chat",
+const defaultIconHints: Record<number, string> = {
+  0: "comida fruta",
+  1: "trabajo computadora",
+  2: "hobby libro",
+  3: "salud corazon",
+  4: "hogar casa",
+  5: "social chat",
 };
 
 
@@ -53,6 +52,9 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
   const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState(defaultIcons[0]);
   const [customIconUrl, setCustomIconUrl] = useState('');
+  const [category, setCategory] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [timeSpent, setTimeSpent] = useState<number | string>('');
   const [isGeneratingIcon, setIsGeneratingIcon] = useState(false);
   const { toast } = useToast();
 
@@ -62,6 +64,9 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
         setTitle(taskToEdit.title);
         setDescription(taskToEdit.description || '');
         setSelectedIcon(taskToEdit.iconUrl);
+        setCategory(taskToEdit.category || '');
+        setDueDate(taskToEdit.dueDate || '');
+        setTimeSpent(taskToEdit.timeSpent !== undefined ? taskToEdit.timeSpent : '');
         if (!defaultIcons.includes(taskToEdit.iconUrl)) {
           setCustomIconUrl(taskToEdit.iconUrl);
         } else {
@@ -73,6 +78,9 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
         setDescription('');
         setSelectedIcon(defaultIcons[0]);
         setCustomIconUrl('');
+        setCategory('');
+        setDueDate('');
+        setTimeSpent('');
       }
     }
   }, [isOpen, taskToEdit]);
@@ -94,7 +102,14 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim()) {
+        toast({
+            title: "Título Requerido",
+            description: "Por favor, ingresa un título para la tarea.",
+            variant: "destructive",
+        });
+        return;
+    }
     if (!selectedIcon) {
         toast({
             title: "Icono Requerido",
@@ -108,8 +123,11 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
       title: title.trim(),
       description: description.trim() || undefined,
       iconUrl: selectedIcon,
+      category: category.trim() || undefined,
+      dueDate: dueDate || undefined,
+      timeSpent: timeSpent === '' ? undefined : Number(timeSpent),
     });
-    onOpenChange(false); // Close dialog on successful submit
+    onOpenChange(false); 
   };
   
   const handleGenerateIcon = useCallback(async () => {
@@ -123,7 +141,7 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
     }
     setIsGeneratingIcon(true);
     try {
-      const result = await generatePixelArtIcon({ prompt: title });
+      const result = await generatePixelArtIconFromPrompt({ prompt: title });
       if (result.iconDataUri) {
         setSelectedIcon(result.iconDataUri);
         setCustomIconUrl(result.iconDataUri); 
@@ -178,6 +196,38 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
             />
           </div>
           <div className="grid gap-2">
+            <Label htmlFor="category">Categoría (Opcional)</Label>
+            <Input
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="Ej: Hogar, Trabajo"
+              className="rounded-none border-foreground"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="dueDate">Fecha de Entrega (Opcional)</Label>
+            <Input
+              id="dueDate"
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="rounded-none border-foreground"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="timeSpent">Tiempo Dedicado (minutos, Opcional)</Label>
+            <Input
+              id="timeSpent"
+              type="number"
+              value={timeSpent}
+              min="0"
+              onChange={(e) => setTimeSpent(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="Ej: 30"
+              className="rounded-none border-foreground"
+            />
+          </div>
+          <div className="grid gap-2">
             <Label>Seleccionar Icono</Label>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-2">
               {defaultIcons.map((icon, index) => (
@@ -195,11 +245,11 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
                 >
                   <Image
                     src={icon}
-                    alt={`Icono pixelado ${index + 1}`}
+                    alt={`Icono predeterminado ${index + 1}`}
                     width={48}
                     height={48}
                     className="image-pixelated"
-                    data-ai-hint={defaultIconHints[icon] || "icono pixel art"}
+                    data-ai-hint={defaultIconHints[index] || "icono pixel art"}
                   />
                 </button>
               ))}
@@ -225,6 +275,9 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
                     onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                        const target = e.target as HTMLImageElement;
                        console.error("Error al cargar URL de icono personalizado:", target.src);
+                       // Optionally set to a fallback or clear the selection
+                       // setSelectedIcon(defaultIcons[0]); 
+                       // setCustomIconUrl('');
                     }}
                   />
                </div>
@@ -244,9 +297,9 @@ export function AddTaskForm({ isOpen, onOpenChange, onSaveTask, taskToEdit }: Ad
               {isGeneratingIcon ? 'Generando...' : 'Generar Icono con IA'}
             </Button>
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-2">
             <DialogClose asChild>
-               <Button type="button" variant="secondary" className="rounded-none border-foreground">Cancelar</Button>
+               <Button type="button" variant="outline" className="rounded-none border-foreground">Cancelar</Button>
             </DialogClose>
             <Button type="submit" className="btn-pixel">
               {taskToEdit ? 'Guardar Cambios' : 'Añadir Tarea'}

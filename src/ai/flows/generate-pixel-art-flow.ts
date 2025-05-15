@@ -3,9 +3,9 @@
 /**
  * @fileOverview Genera iconos de pixel art basados en una indicación de texto.
  *
- * - generatePixelArtIcon - Una función para generar un icono de pixel art.
- * - GeneratePixelArtIconInput - El tipo de entrada para la función generatePixelArtIcon.
- * - GeneratePixelArtIconOutput - El tipo de retorno para la función generatePixelArtIcon.
+ * - generatePixelArtIconFromPrompt - Una función para generar un icono de pixel art.
+ * - GeneratePixelArtIconInput - El tipo de entrada para la función generatePixelArtIconFromPrompt.
+ * - GeneratePixelArtIconOutput - El tipo de retorno para la función generatePixelArtIconFromPrompt.
  */
 
 import {ai} from '@/ai/ai-instance';
@@ -21,7 +21,7 @@ const GeneratePixelArtIconOutputSchema = z.object({
 });
 export type GeneratePixelArtIconOutput = z.infer<typeof GeneratePixelArtIconOutputSchema>;
 
-export async function generatePixelArtIcon(input: GeneratePixelArtIconInput): Promise<GeneratePixelArtIconOutput> {
+export async function generatePixelArtIconFromPrompt(input: GeneratePixelArtIconInput): Promise<GeneratePixelArtIconOutput> {
   return generatePixelArtIconFlow(input);
 }
 
@@ -33,13 +33,31 @@ const generatePixelArtIconFlow = ai.defineFlow(
   },
   async (input) => {
     // Construir una indicación más específica para la generación de pixel art
-    const imagePrompt = `Genera una imagen pequeña, simple e icónica de estilo pixel art de 4 u 8 bits (por ejemplo, resolución de 32x32 o 64x64 píxeles) adecuada como icono de tarea, basada en el tema: "${input.prompt}". El icono debe ser claro, fácilmente reconocible en tamaños pequeños y usar una paleta de colores limitada característica del pixel art. El fondo debe ser transparente o de un color sólido simple que no distraiga si la transparencia no es soportada directamente por la generación. Evita detalles complejos.`;
+    const imagePrompt = `Genera una imagen pequeña, simple e icónica de estilo pixel art de 4 u 8 bits (por ejemplo, resolución de 32x32 o 64x64 píxeles) adecuada como icono de tarea, basada en el tema: "${input.prompt}". El icono debe ser claro, fácilmente reconocible en tamaños pequeños y usar una paleta de colores limitada característica del pixel art. El fondo debe ser transparente o de un color sólido simple que no distraiga si la transparencia no es soportada directamente por la generación. Evita detalles complejos. El estilo debe ser estrictamente pixelado, sin anti-aliasing ni suavizado.`;
 
     const {media} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-exp', // IMPORTANTE: Modelo específico para generación de imágenes
       prompt: imagePrompt,
       config: {
         responseModalities: ['IMAGE', 'TEXT'], // DEBE proporcionar tanto TEXTO como IMAGEN
+         safetySettings: [ // Added safety settings to be less restrictive for creative content
+          {
+            category: 'HARM_CATEGORY_HATE_SPEECH',
+            threshold: 'BLOCK_ONLY_HIGH',
+          },
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE', 
+          },
+          {
+            category: 'HARM_CATEGORY_HARASSMENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+          },
+          {
+            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+          },
+        ],
       },
     });
 

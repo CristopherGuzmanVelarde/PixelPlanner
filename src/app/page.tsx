@@ -1,13 +1,16 @@
+
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback }
+from 'react';
 import type { Task } from '@/types';
 import { TaskList } from '@/components/task-list';
 import { AddTaskForm } from '@/components/add-task-form';
+import { TaskReportModal } from '@/components/task-report-modal'; // Nueva importación
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, Archive, Settings, Palette } from 'lucide-react';
+import { Plus, ListChecks, Archive, Settings, Palette, FileText } from 'lucide-react'; // Añadido FileText
 import {
   AlertDialog,
   AlertDialogAction,
@@ -62,6 +65,7 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false); // Estado para el modal de reporte
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [taskToDeleteId, setTaskToDeleteId] = useState<string | null>(null);
@@ -97,23 +101,29 @@ export default function Home() {
     }
   }
 
-  const handleSaveTask = useCallback((taskData: { title: string; description?: string; iconUrl: string; category?: string; dueDate?: string }) => {
+  const handleSaveTask = useCallback((taskData: { title: string; description?: string; iconUrl: string; category?: string; dueDate?: string; timeSpent?: number }) => {
+    const now = new Date().toISOString();
     if (taskToEdit) {
       setTasks(prevTasks =>
         prevTasks.map(task =>
           task.id === taskToEdit.id
-            ? { ...taskToEdit, ...taskData, lastModified: new Date().toISOString() }
+            ? { ...taskToEdit, ...taskData, timeSpent: taskData.timeSpent || taskToEdit.timeSpent || 0, lastModified: now }
             : task
         )
       );
       toast({ title: "Tarea Actualizada", description: `La tarea "${taskData.title}" ha sido actualizada.` });
     } else {
       const newTask: Task = {
-        ...taskData,
         id: generateId(),
+        title: taskData.title,
+        description: taskData.description,
+        iconUrl: taskData.iconUrl,
+        category: taskData.category,
+        dueDate: taskData.dueDate,
+        timeSpent: taskData.timeSpent || 0,
         completed: false,
-        createdAt: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
+        createdAt: now,
+        lastModified: now,
       };
       setTasks(prevTasks => [newTask, ...prevTasks]);
       toast({ title: "Tarea Añadida", description: `La tarea "${taskData.title}" ha sido añadida.` });
@@ -160,7 +170,7 @@ export default function Home() {
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
     if (a.completed === b.completed) {
-      return new Date(b.lastModified || b.createdAt || 0).getTime() - new Date(a.lastModified || a.createdAt || 0).getTime();
+      return new Date(b.lastModified || b.createdAt).getTime() - new Date(a.lastModified || a.createdAt).getTime();
     }
     return a.completed ? 1 : -1;
   });
@@ -178,7 +188,6 @@ export default function Home() {
     setTasks(prevTasks => prevTasks.map(task => ({ ...task, completed: true, lastModified: new Date().toISOString() })));
     toast({ title: "Tareas Completadas", description: "Todas las tareas se han marcado como completadas." });
   };
-
 
   return (
     <div className="container mx-auto max-w-3xl py-8 px-4">
@@ -206,6 +215,11 @@ export default function Home() {
                 <DropdownMenuItem onClick={clearAllTasks} className="text-destructive cursor-pointer hover:bg-destructive/10 hover:text-destructive">
                   <Archive className="mr-2 h-4 w-4" />
                   <span>Eliminar Todas las Tareas</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border"/>
+                <DropdownMenuItem onClick={() => setIsReportModalOpen(true)} className="cursor-pointer hover:bg-accent/80">
+                  <FileText className="mr-2 h-4 w-4" />
+                  <span>Ver Reporte de Tiempo</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border"/>
                  <DropdownMenuItem disabled className="cursor-not-allowed">
@@ -262,6 +276,9 @@ export default function Home() {
               {filteredTasks.length === 0 && !searchTerm && tasks.length > 0 && (
                  <p className="text-center text-muted-foreground mt-8">No hay tareas que coincidan con el filtro seleccionado.</p>
               )}
+               {tasks.length === 0 && !searchTerm && (
+                <p className="text-center text-muted-foreground mt-8">¡No hay tareas aún! Añade una para empezar.</p>
+              )}
             </>
            ) : (
              <p className="text-center text-muted-foreground p-8">Cargando tareas...</p>
@@ -276,6 +293,11 @@ export default function Home() {
             onOpenChange={handleFormDialogValidOpenChange}
             onSaveTask={handleSaveTask}
             taskToEdit={taskToEdit}
+          />
+          <TaskReportModal
+            isOpen={isReportModalOpen}
+            onOpenChange={setIsReportModalOpen}
+            tasks={tasks}
           />
           <Button
             onClick={handleOpenAddTaskDialog}
@@ -306,4 +328,3 @@ export default function Home() {
     </div>
   );
 }
-
