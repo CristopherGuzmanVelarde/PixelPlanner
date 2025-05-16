@@ -51,7 +51,6 @@ export function PomodoroTimer() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setIsActive(false);
       
-      // Notification and mode switch logic
       let notificationTitle = "";
       let nextMode: PomodoroMode = 'pomodoro';
 
@@ -79,10 +78,8 @@ export function PomodoroTimer() {
       setMode(nextMode);
       setTimeLeft(getDuration(nextMode));
 
-      // Attempt to play a sound (requires user interaction first in most browsers)
-      // You might want to add a dedicated "enable sound" button for better UX
       try {
-        const audio = new Audio('/notification.mp3'); // Make sure you have this file in /public
+        const audio = new Audio('/notification.mp3'); 
         audio.play().catch(e => console.warn("Error al reproducir sonido:", e));
       } catch(e) {
         console.warn("No se pudo reproducir sonido de notificación:", e);
@@ -109,7 +106,7 @@ export function PomodoroTimer() {
     setIsActive(false);
     setMode(newMode);
     setTimeLeft(getDuration(newMode));
-    if (newMode === 'pomodoro') setPomodorosCompletedThisCycle(0); // Reset if manually switching to pomodoro
+    if (newMode === 'pomodoro') setPomodorosCompletedThisCycle(0); 
   };
 
   const formatTime = (seconds: number) => {
@@ -134,7 +131,7 @@ export function PomodoroTimer() {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center space-y-6 sm:space-y-8">
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap justify-center gap-2">
             {(Object.keys(modeConfig) as PomodoroMode[]).map((key) => {
               const Icon = modeConfig[key].icon;
               return (
@@ -163,19 +160,19 @@ export function PomodoroTimer() {
           <div className="flex space-x-3 sm:space-x-4">
             <Button
               onClick={toggleTimer}
-              className="btn-pixel text-lg sm:text-xl px-6 sm:px-8 py-3 sm:py-4 h-auto"
+              className="btn-pixel px-5 py-2.5 text-base" // Adjusted size
               aria-label={isActive ? "Pausar temporizador" : "Iniciar temporizador"}
             >
-              {isActive ? <Pause className="mr-2 h-5 w-5 sm:h-6 sm:w-6" /> : <Play className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />}
+              {isActive ? <Pause className="mr-2 h-5 w-5" /> : <Play className="mr-2 h-5 w-5" />} 
               {isActive ? 'Pausar' : 'Iniciar'}
             </Button>
             <Button
               onClick={resetTimer}
               variant="outline"
-              className="rounded-none border-2 border-foreground hover:bg-muted text-lg sm:text-xl px-6 sm:px-8 py-3 sm:py-4 h-auto shadow-[2px_2px_0px_0px_hsl(var(--foreground))] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_hsl(var(--foreground))]"
+              className="rounded-none border-2 border-foreground hover:bg-muted px-5 py-2.5 text-base shadow-[2px_2px_0px_0px_hsl(var(--foreground))] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_hsl(var(--foreground))]" // Adjusted size
               aria-label="Reiniciar temporizador"
             >
-              <RotateCcw className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+              <RotateCcw className="mr-2 h-5 w-5" />
               Reiniciar
             </Button>
           </div>
@@ -189,3 +186,4 @@ export function PomodoroTimer() {
     </div>
   );
 }
+
