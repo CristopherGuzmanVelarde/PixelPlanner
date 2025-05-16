@@ -363,7 +363,23 @@ export default function Home() {
                       />
                     ) : (
                       <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="1" strokeLinecap="butt" strokeLinejoin="bevel" className="opacity-50 mb-4 image-pixelated"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 32 32" className="opacity-50 mb-4 image-pixelated fill-current text-muted-foreground">
+                          <title>Lista de tareas vacía</title>
+                          {/* Top Roll Part */}
+                          <rect x="4" y="4" width="24" height="4" />
+                          <rect x="3" y="5" width="1" height="2" />
+                          <rect x="28" y="5" width="1" height="2" />
+                          {/* Paper Part */}
+                          <rect x="6" y="8" width="20" height="18" />
+                          {/* Bottom Roll Part */}
+                          <rect x="4" y="26" width="24" height="4" />
+                          <rect x="3" y="25" width="1" height="2" />
+                          <rect x="28" y="25" width="1" height="2" />
+                          {/* Subtle page content indication */}
+                          <rect x="9" y="12" width="14" height="2" className="fill-current text-muted-foreground/60" />
+                          <rect x="9" y="16" width="14" height="2" className="fill-current text-muted-foreground/60" />
+                          <rect x="9" y="20" width="10" height="2" className="fill-current text-muted-foreground/60" />
+                        </svg>
                         {tasks.length === 0 ? (
                           <p className="text-muted-foreground">¡No hay tareas aún! Añade una para empezar.</p>
                         ) : searchTerm ? (

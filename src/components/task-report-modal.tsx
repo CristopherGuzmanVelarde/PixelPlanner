@@ -106,7 +106,20 @@ export function TaskReportModal({ isOpen, onOpenChange, tasks }: TaskReportModal
             </div>
           </>
         ) : (
-          <div className="text-center py-10 text-muted-foreground">
+          <div className="text-center py-10 text-muted-foreground flex flex-col items-center justify-center">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" className="opacity-60 mb-3 image-pixelated stroke-muted-foreground fill-transparent">
+              <title>No hay datos para el reporte</title>
+              {/* Border */}
+              <rect x="3" y="3" width="18" height="18" rx="0" strokeWidth="2" />
+              {/* Grid lines (thinner) */}
+              <line x1="3" y1="9" x2="21" y2="9" strokeWidth="1" className="stroke-muted-foreground/50" />
+              <line x1="3" y1="15" x2="21" y2="15" strokeWidth="1" className="stroke-muted-foreground/50" />
+              <line x1="9" y1="3" x2="9" y2="21" strokeWidth="1" className="stroke-muted-foreground/50" />
+              <line x1="15" y1="3" x2="15" y2="21" strokeWidth="1" className="stroke-muted-foreground/50" />
+              {/* "X" in the middle */}
+              <line x1="7" y1="7" x2="17" y2="17" strokeWidth="2.5" />
+              <line x1="17" y1="7" x2="7" y2="17" strokeWidth="2.5" />
+            </svg>
             No hay tareas con tiempo registrado para mostrar en el reporte.
           </div>
         )}
