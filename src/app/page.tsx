@@ -6,11 +6,11 @@ import type { Task } from '@/types';
 import { TaskList } from '@/components/task-list';
 import { AddTaskForm } from '@/components/add-task-form';
 import { TaskReportModal } from '@/components/task-report-modal';
-import { PomodoroTimer } from '@/components/pomodoro-timer'; // Nueva importación
+import { PomodoroTimer } from '@/components/pomodoro-timer';
+import { PixelPaletteGenerator } from '@/components/pixel-palette-generator'; // Nueva importación
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon, ListTodo, Timer } from 'lucide-react';
+import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon, ListTodo, Timer, Palette as PaletteIcon } from 'lucide-react'; // PaletteIcon importado
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,7 +67,7 @@ const saveTasksToLocalStorage = (tasks: Task[]) => {
 
 type FilterType = "all" | "completed" | "active";
 type Theme = "light" | "dark";
-type ActiveSection = "tasks" | "pomodoro"; // Nuevo tipo
+type ActiveSection = "tasks" | "pomodoro" | "palette"; // 'palette' añadido
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -80,7 +80,7 @@ export default function Home() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [theme, setTheme] = useState<Theme>('light');
-  const [activeSection, setActiveSection] = useState<ActiveSection>('tasks'); // Nuevo estado
+  const [activeSection, setActiveSection] = useState<ActiveSection>('tasks');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -236,7 +236,7 @@ export default function Home() {
             PixelPlanner
           </CardTitle>
            <CardDescription className="text-xs sm:text-sm text-muted-foreground flex items-center justify-center gap-1">
-             Tus tareas y pomodoros, ¡con un toque pixelado! 
+             Tus tareas y herramientas pixel, ¡todo en uno!
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Info className="h-3 w-3 cursor-help text-muted-foreground/70 hover:text-muted-foreground"/>
@@ -290,6 +290,7 @@ export default function Home() {
               activeSection === 'tasks' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
               activeSection !== 'tasks' && "border-transparent"
             )}
+            aria-pressed={activeSection === 'tasks'}
           >
             <ListTodo className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             Tareas
@@ -302,9 +303,23 @@ export default function Home() {
               activeSection === 'pomodoro' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
               activeSection !== 'pomodoro' && "border-transparent"
             )}
+            aria-pressed={activeSection === 'pomodoro'}
           >
             <Timer className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             Pomodoro
+          </Button>
+          <Button
+            variant={activeSection === 'palette' ? 'default' : 'ghost'}
+            onClick={() => setActiveSection('palette')}
+            className={cn(
+              "flex-1 sm:flex-none rounded-none px-4 py-3 text-sm sm:text-base",
+              activeSection === 'palette' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
+              activeSection !== 'palette' && "border-transparent"
+            )}
+            aria-pressed={activeSection === 'palette'}
+          >
+            <PaletteIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            Paletas
           </Button>
         </div>
         
@@ -365,17 +380,13 @@ export default function Home() {
                       <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 32 32" className="opacity-50 mb-4 image-pixelated fill-current text-muted-foreground">
                           <title>Lista de tareas vacía</title>
-                          {/* Top Roll Part */}
                           <rect x="4" y="4" width="24" height="4" />
                           <rect x="3" y="5" width="1" height="2" />
                           <rect x="28" y="5" width="1" height="2" />
-                          {/* Paper Part */}
                           <rect x="6" y="8" width="20" height="18" />
-                          {/* Bottom Roll Part */}
                           <rect x="4" y="26" width="24" height="4" />
                           <rect x="3" y="25" width="1" height="2" />
                           <rect x="28" y="25" width="1" height="2" />
-                          {/* Subtle page content indication */}
                           <rect x="9" y="12" width="14" height="2" className="fill-current text-muted-foreground/60" />
                           <rect x="9" y="16" width="14" height="2" className="fill-current text-muted-foreground/60" />
                           <rect x="9" y="20" width="10" height="2" className="fill-current text-muted-foreground/60" />
@@ -404,6 +415,9 @@ export default function Home() {
           )}
           {activeSection === 'pomodoro' && (
             <PomodoroTimer />
+          )}
+          {activeSection === 'palette' && (
+            <PixelPaletteGenerator />
           )}
         </CardContent>
       </Card>
@@ -457,4 +471,3 @@ export default function Home() {
     </TooltipProvider>
   );
 }
-
