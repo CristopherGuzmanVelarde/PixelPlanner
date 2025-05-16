@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react'; // Timer icon import removed
+import { Play, Pause, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -114,19 +114,33 @@ export function PomodoroTimer() {
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+  
+  const PixelBrainIcon = () => (
+    <svg viewBox="0 0 32 32" fill="currentColor" className="mr-1.5 h-4 w-4 image-pixelated stroke-current stroke-1" aria-hidden="true">
+      <title>Icono de Cerebro Pixelado para Pomodoro</title>
+      <rect x="10" y="6" width="12" height="4" /><rect x="12" y="4" width="8" height="2" /><rect x="8" y="8" width="2" height="4" /><rect x="22" y="8" width="2" height="4" /><rect x="8" y="10" width="6" height="10" /><rect x="6" y="12" width="2" height="6" /><rect x="8" y="20" width="4" height="2" /><rect x="18" y="10" width="6" height="10" /><rect x="24" y="12" width="2" height="6" /><rect x="20" y="20" width="4" height="2" /><rect x="14" y="18" width="4" height="6" />
+    </svg>
+  );
+
+  const PixelCoffeeIcon = () => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="mr-1.5 h-4 w-4 image-pixelated">
+      <title>Pixel Coffee Icon</title>
+      <path d="M6,2 L18,2 L18,4 L6,4 L6,2 Z M4,5 L20,5 L20,7 L4,7 L4,5 Z M4,8 L16,8 L16,18 L4,18 L4,8 Z M18,9 L22,9 L22,15 L18,15 L18,9 Z M6,19 L18,19 L18,21 L6,21 L6,19 Z"/>
+    </svg>
+  );
 
   const modeConfig = {
-    pomodoro: { label: 'Pomodoro', icon: Brain, duration: POMODORO_DURATION },
-    shortBreak: { label: 'Descanso Corto', icon: Coffee, duration: SHORT_BREAK_DURATION },
-    longBreak: { label: 'Descanso Largo', icon: Coffee, duration: LONG_BREAK_DURATION },
+    pomodoro: { label: 'Pomodoro', icon: PixelBrainIcon, duration: POMODORO_DURATION },
+    shortBreak: { label: 'Descanso Corto', icon: PixelCoffeeIcon, duration: SHORT_BREAK_DURATION },
+    longBreak: { label: 'Descanso Largo', icon: PixelCoffeeIcon, duration: LONG_BREAK_DURATION },
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-4">
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm rounded-none border-2 border-foreground shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl sm:text-3xl font-bold text-primary flex items-center justify-center">
-            {/* Pixel Art Timer Icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="28"
@@ -137,28 +151,20 @@ export function PomodoroTimer() {
               aria-hidden="true"
             >
               <title>Pixel Clock Icon</title>
-              {/* Outer frame */}
               <rect x="3" y="1" width="18" height="2" />
               <rect x="3" y="21" width="18" height="2" />
               <rect x="1" y="3" width="2" height="18" />
               <rect x="21" y="3" width="2" height="18" />
-              {/* Corners for a more rounded/octagonal feel */}
               <rect x="2" y="2" width="1" height="1" />
               <rect x="21" y="2" width="1" height="1" />
               <rect x="2" y="21" width="1" height="1" />
               <rect x="21" y="21" width="1" height="1" />
-
-              {/* Clock face dots (simplified) */}
-              <rect x="11" y="4" width="2" height="2" /> {/* 12 o'clock */}
-              <rect x="18" y="11" width="2" height="2" /> {/* 3 o'clock */}
-              <rect x="11" y="18" width="2" height="2" /> {/* 6 o'clock */}
-              <rect x="4" y="11" width="2" height="2" /> {/* 9 o'clock */}
-
-              {/* Hands */}
-              <rect x="11" y="7" width="2" height="6" /> {/* Minute hand (pointing up) */}
-              <rect x="13" y="11" width="4" height="2" /> {/* Hour hand (pointing right) */}
-              
-              {/* Center dot */}
+              <rect x="11" y="4" width="2" height="2" /> 
+              <rect x="18" y="11" width="2" height="2" /> 
+              <rect x="11" y="18" width="2" height="2" /> 
+              <rect x="4" y="11" width="2" height="2" /> 
+              <rect x="11" y="7" width="2" height="6" /> 
+              <rect x="13" y="11" width="4" height="2" /> 
               <rect x="11" y="11" width="2" height="2" />
             </svg>
             Temporizador Pomodoro
@@ -167,7 +173,7 @@ export function PomodoroTimer() {
         <CardContent className="flex flex-col items-center space-y-6 sm:space-y-8">
           <div className="flex flex-wrap justify-center gap-2">
             {(Object.keys(modeConfig) as PomodoroMode[]).map((key) => {
-              const Icon = modeConfig[key].icon;
+              const IconComponent = modeConfig[key].icon;
               return (
                 <Button
                   key={key}
@@ -179,7 +185,7 @@ export function PomodoroTimer() {
                     mode !== key && "shadow-[1px_1px_0px_0px_hsl(var(--foreground))] hover:shadow-[0.5px_0.5px_0px_0px_hsl(var(--foreground))]"
                   )}
                 >
-                  <Icon className="mr-1.5 h-4 w-4" />
+                  <IconComponent />
                   {modeConfig[key].label}
                 </Button>
               );
@@ -221,3 +227,4 @@ export function PomodoroTimer() {
   );
 }
 
+    

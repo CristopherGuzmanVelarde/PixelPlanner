@@ -7,10 +7,10 @@ import { TaskList } from '@/components/task-list';
 import { AddTaskForm } from '@/components/add-task-form';
 import { TaskReportModal } from '@/components/task-report-modal';
 import { PomodoroTimer } from '@/components/pomodoro-timer';
-import { ProductivityBooster } from '@/components/productivity-booster'; // Nueva importación
+import { ProductivityBooster } from '@/components/productivity-booster';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon, ListTodo, Timer, Brain as ProductivityIcon } from 'lucide-react'; // WeatherIcon renombrado a Brain
+import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,7 +67,7 @@ const saveTasksToLocalStorage = (tasks: Task[]) => {
 
 type FilterType = "all" | "completed" | "active";
 type Theme = "light" | "dark";
-type ActiveSection = "tasks" | "pomodoro" | "productivity"; // 'weather' cambiado a 'productivity'
+type ActiveSection = "tasks" | "pomodoro" | "productivity";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -293,7 +293,10 @@ export default function Home() {
             )}
             aria-pressed={activeSection === 'tasks'}
           >
-            <ListTodo className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <svg viewBox="0 0 24 24" fill="currentColor" className="mr-2 h-4 w-4 sm:h-5 sm:w-5 image-pixelated">
+              <title>Pixel Task Icon</title>
+              <path d="M6 2h12v2h2v18H4V4h2V2zm0 4v14h12V6H6zm2 2h8v2H8zm0 4h8v2H8zm0 4h4v2H8z" />
+            </svg>
             Tareas
           </Button>
           <Button
@@ -306,7 +309,10 @@ export default function Home() {
             )}
             aria-pressed={activeSection === 'pomodoro'}
           >
-            <Timer className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-2 h-4 w-4 sm:h-5 sm:w-5 image-pixelated" aria-hidden="true">
+              <title>Pixel Clock Icon</title>
+              <rect x="3" y="1" width="18" height="2" /><rect x="3" y="21" width="18" height="2" /><rect x="1" y="3" width="2" height="18" /><rect x="21" y="3" width="2" height="18" /><rect x="2" y="2" width="1" height="1" /><rect x="21" y="2" width="1" height="1" /><rect x="2" y="21" width="1" height="1" /><rect x="21" y="21" width="1" height="1" /><rect x="11" y="4" width="2" height="2" /><rect x="18" y="11" width="2" height="2" /><rect x="11" y="18" width="2" height="2" /><rect x="4" y="11" width="2" height="2" /><rect x="11" y="7" width="2" height="6" /><rect x="13" y="11" width="4" height="2" /><rect x="11" y="11" width="2" height="2" />
+            </svg>
             Pomodoro
           </Button>
           <Button
@@ -319,7 +325,10 @@ export default function Home() {
             )}
             aria-pressed={activeSection === 'productivity'}
           >
-            <ProductivityIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <svg viewBox="0 0 32 32" fill="currentColor" className="mr-2 h-4 w-4 sm:h-5 sm:w-5 image-pixelated stroke-current stroke-1" aria-hidden="true">
+              <title>Icono de Cerebro Pixelado</title>
+              <rect x="10" y="6" width="12" height="4" /><rect x="12" y="4" width="8" height="2" /><rect x="8" y="8" width="2" height="4" /><rect x="22" y="8" width="2" height="4" /><rect x="8" y="10" width="6" height="10" /><rect x="6" y="12" width="2" height="6" /><rect x="8" y="20" width="4" height="2" /><rect x="18" y="10" width="6" height="10" /><rect x="24" y="12" width="2" height="6" /><rect x="20" y="20" width="4" height="2" /><rect x="14" y="18" width="4" height="6" />
+            </svg>
             Productividad
           </Button>
         </div>
@@ -472,3 +481,5 @@ export default function Home() {
     </TooltipProvider>
   );
 }
+
+    

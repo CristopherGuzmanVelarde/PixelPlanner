@@ -3,12 +3,20 @@
 
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea'; // Usamos Textarea para más espacio
+import { Textarea } from '@/components/ui/textarea'; 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Lightbulb, Wand2 } from 'lucide-react'; // Lightbulb como ícono para "idea"
+import { Loader2, Wand2 } from 'lucide-react'; 
 import { useToast } from '@/hooks/use-toast';
 import { generateProductivityTip } from '@/ai/flows/generate-productivity-tip-flow';
 import { cn } from '@/lib/utils';
+
+const PixelLightbulbIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 mr-2 image-pixelated">
+    <title>Pixel Lightbulb Icon</title>
+    <path d="M10,2 L14,2 L14,4 L10,4 L10,2 Z M8,5 L16,5 L16,7 L8,7 L8,5 Z M7,8 L17,8 L17,15 L7,15 L7,8 Z M9,16 L15,16 L15,18 L9,18 L9,16 Z M10,19 L14,19 L14,22 L10,22 L10,19 Z"/>
+  </svg>
+);
+
 
 export function ProductivityBooster() {
   const [userInput, setUserInput] = useState('');
@@ -49,20 +57,16 @@ export function ProductivityBooster() {
           <CardTitle className="text-2xl sm:text-3xl font-bold text-primary flex items-center justify-center">
             <svg viewBox="0 0 32 32" className="w-8 h-8 mr-2 image-pixelated fill-primary stroke-primary-foreground stroke-1" aria-hidden="true">
               <title>Icono de Cerebro Pixelado</title>
-              {/* Parte superior del cerebro */}
               <rect x="10" y="6" width="12" height="4" />
               <rect x="12" y="4" width="8" height="2" />
               <rect x="8" y="8" width="2" height="4" />
               <rect x="22" y="8" width="2" height="4" />
-              {/* Mitad izquierda */}
               <rect x="8" y="10" width="6" height="10" />
               <rect x="6" y="12" width="2" height="6" />
               <rect x="8" y="20" width="4" height="2" />
-              {/* Mitad derecha */}
               <rect x="18" y="10" width="6" height="10" />
               <rect x="24" y="12" width="2" height="6" />
               <rect x="20" y="20" width="4" height="2" />
-              {/* "Tallo" */}
               <rect x="14" y="18" width="4" height="6" />
             </svg>
             Potenciador de Productividad
@@ -93,7 +97,7 @@ export function ProductivityBooster() {
             <Card className="w-full bg-background/50 rounded-none border-2 border-foreground p-4 mt-4">
               <CardHeader className="p-0 mb-2 text-center">
                 <CardTitle className="text-lg text-primary flex items-center justify-center">
-                  <Lightbulb className="w-5 h-5 mr-2" /> ¡Aquí tienes un consejo!
+                  <PixelLightbulbIcon /> ¡Aquí tienes un consejo!
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0 text-center">
@@ -106,3 +110,5 @@ export function ProductivityBooster() {
     </div>
   );
 }
+
+    
