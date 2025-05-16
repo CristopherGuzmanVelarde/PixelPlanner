@@ -7,10 +7,10 @@ import { TaskList } from '@/components/task-list';
 import { AddTaskForm } from '@/components/add-task-form';
 import { TaskReportModal } from '@/components/task-report-modal';
 import { PomodoroTimer } from '@/components/pomodoro-timer';
-import { WeatherWidget } from '@/components/weather-widget'; // Nueva importación
+import { ProductivityBooster } from '@/components/productivity-booster'; // Nueva importación
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon, ListTodo, Timer, CloudSun as WeatherIcon } from 'lucide-react';
+import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon, ListTodo, Timer, Brain as ProductivityIcon } from 'lucide-react'; // WeatherIcon renombrado a Brain
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,7 +67,7 @@ const saveTasksToLocalStorage = (tasks: Task[]) => {
 
 type FilterType = "all" | "completed" | "active";
 type Theme = "light" | "dark";
-type ActiveSection = "tasks" | "pomodoro" | "weather"; // 'weather' añadido, 'palette' eliminado
+type ActiveSection = "tasks" | "pomodoro" | "productivity"; // 'weather' cambiado a 'productivity'
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -310,17 +310,17 @@ export default function Home() {
             Pomodoro
           </Button>
           <Button
-            variant={activeSection === 'weather' ? 'default' : 'ghost'}
-            onClick={() => setActiveSection('weather')}
+            variant={activeSection === 'productivity' ? 'default' : 'ghost'}
+            onClick={() => setActiveSection('productivity')}
             className={cn(
               "flex-1 sm:flex-none rounded-none px-4 py-3 text-sm sm:text-base",
-              activeSection === 'weather' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
-              activeSection !== 'weather' && "border-transparent"
+              activeSection === 'productivity' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
+              activeSection !== 'productivity' && "border-transparent"
             )}
-            aria-pressed={activeSection === 'weather'}
+            aria-pressed={activeSection === 'productivity'}
           >
-            <WeatherIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            Clima
+            <ProductivityIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            Productividad
           </Button>
         </div>
         
@@ -417,8 +417,8 @@ export default function Home() {
           {activeSection === 'pomodoro' && (
             <PomodoroTimer />
           )}
-          {activeSection === 'weather' && (
-            <WeatherWidget />
+          {activeSection === 'productivity' && (
+            <ProductivityBooster />
           )}
         </CardContent>
       </Card>
@@ -472,4 +472,3 @@ export default function Home() {
     </TooltipProvider>
   );
 }
-
