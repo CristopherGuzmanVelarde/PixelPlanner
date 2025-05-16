@@ -7,10 +7,10 @@ import { TaskList } from '@/components/task-list';
 import { AddTaskForm } from '@/components/add-task-form';
 import { TaskReportModal } from '@/components/task-report-modal';
 import { PomodoroTimer } from '@/components/pomodoro-timer';
-import { PixelPaletteGenerator } from '@/components/pixel-palette-generator'; // Nueva importación
+import { WeatherWidget } from '@/components/weather-widget'; // Nueva importación
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon, ListTodo, Timer, Palette as PaletteIcon } from 'lucide-react'; // PaletteIcon importado
+import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon, ListTodo, Timer, CloudSun as WeatherIcon } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,7 +67,7 @@ const saveTasksToLocalStorage = (tasks: Task[]) => {
 
 type FilterType = "all" | "completed" | "active";
 type Theme = "light" | "dark";
-type ActiveSection = "tasks" | "pomodoro" | "palette"; // 'palette' añadido
+type ActiveSection = "tasks" | "pomodoro" | "weather"; // 'weather' añadido, 'palette' eliminado
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -88,12 +88,13 @@ export default function Home() {
     setTasks(loadTasksFromLocalStorage());
 
     const storedTheme = localStorage.getItem('pixelPlannerTheme') as Theme | null;
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (storedTheme) {
-      setTheme(storedTheme);
-    } else {
-      setTheme(systemPrefersDark ? 'dark' : 'light');
+    if (typeof window !== 'undefined') {
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (storedTheme) {
+          setTheme(storedTheme);
+        } else {
+          setTheme(systemPrefersDark ? 'dark' : 'light');
+        }
     }
   }, []);
 
@@ -309,17 +310,17 @@ export default function Home() {
             Pomodoro
           </Button>
           <Button
-            variant={activeSection === 'palette' ? 'default' : 'ghost'}
-            onClick={() => setActiveSection('palette')}
+            variant={activeSection === 'weather' ? 'default' : 'ghost'}
+            onClick={() => setActiveSection('weather')}
             className={cn(
               "flex-1 sm:flex-none rounded-none px-4 py-3 text-sm sm:text-base",
-              activeSection === 'palette' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
-              activeSection !== 'palette' && "border-transparent"
+              activeSection === 'weather' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
+              activeSection !== 'weather' && "border-transparent"
             )}
-            aria-pressed={activeSection === 'palette'}
+            aria-pressed={activeSection === 'weather'}
           >
-            <PaletteIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            Paletas
+            <WeatherIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            Clima
           </Button>
         </div>
         
@@ -416,8 +417,8 @@ export default function Home() {
           {activeSection === 'pomodoro' && (
             <PomodoroTimer />
           )}
-          {activeSection === 'palette' && (
-            <PixelPaletteGenerator />
+          {activeSection === 'weather' && (
+            <WeatherWidget />
           )}
         </CardContent>
       </Card>
@@ -471,3 +472,4 @@ export default function Home() {
     </TooltipProvider>
   );
 }
+
