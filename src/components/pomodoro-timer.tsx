@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Timer, Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
+import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react'; // Timer icon import removed
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -126,7 +126,41 @@ export function PomodoroTimer() {
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm rounded-none border-2 border-foreground shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl sm:text-3xl font-bold text-primary flex items-center justify-center">
-            <Timer className="mr-2 h-7 w-7 sm:h-8 sm:w-8" />
+            {/* Pixel Art Timer Icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="mr-2 h-7 w-7 sm:h-8 sm:w-8 text-primary image-pixelated"
+              aria-hidden="true"
+            >
+              <title>Pixel Clock Icon</title>
+              {/* Outer frame */}
+              <rect x="3" y="1" width="18" height="2" />
+              <rect x="3" y="21" width="18" height="2" />
+              <rect x="1" y="3" width="2" height="18" />
+              <rect x="21" y="3" width="2" height="18" />
+              {/* Corners for a more rounded/octagonal feel */}
+              <rect x="2" y="2" width="1" height="1" />
+              <rect x="21" y="2" width="1" height="1" />
+              <rect x="2" y="21" width="1" height="1" />
+              <rect x="21" y="21" width="1" height="1" />
+
+              {/* Clock face dots (simplified) */}
+              <rect x="11" y="4" width="2" height="2" /> {/* 12 o'clock */}
+              <rect x="18" y="11" width="2" height="2" /> {/* 3 o'clock */}
+              <rect x="11" y="18" width="2" height="2" /> {/* 6 o'clock */}
+              <rect x="4" y="11" width="2" height="2" /> {/* 9 o'clock */}
+
+              {/* Hands */}
+              <rect x="11" y="7" width="2" height="6" /> {/* Minute hand (pointing up) */}
+              <rect x="13" y="11" width="4" height="2" /> {/* Hour hand (pointing right) */}
+              
+              {/* Center dot */}
+              <rect x="11" y="11" width="2" height="2" />
+            </svg>
             Temporizador Pomodoro
           </CardTitle>
         </CardHeader>
@@ -160,7 +194,7 @@ export function PomodoroTimer() {
           <div className="flex space-x-3 sm:space-x-4">
             <Button
               onClick={toggleTimer}
-              className="btn-pixel px-5 py-2.5 text-base" // Adjusted size
+              className="btn-pixel px-5 py-2.5 text-base" 
               aria-label={isActive ? "Pausar temporizador" : "Iniciar temporizador"}
             >
               {isActive ? <Pause className="mr-2 h-5 w-5" /> : <Play className="mr-2 h-5 w-5" />} 
@@ -169,7 +203,7 @@ export function PomodoroTimer() {
             <Button
               onClick={resetTimer}
               variant="outline"
-              className="rounded-none border-2 border-foreground hover:bg-muted px-5 py-2.5 text-base shadow-[2px_2px_0px_0px_hsl(var(--foreground))] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_hsl(var(--foreground))]" // Adjusted size
+              className="rounded-none border-2 border-foreground hover:bg-muted px-5 py-2.5 text-base shadow-[2px_2px_0px_0px_hsl(var(--foreground))] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_hsl(var(--foreground))]" 
               aria-label="Reiniciar temporizador"
             >
               <RotateCcw className="mr-2 h-5 w-5" />
