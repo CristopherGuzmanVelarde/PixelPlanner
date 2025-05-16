@@ -1,16 +1,16 @@
 
 "use client";
 
-import { useState, useEffect, useCallback }
-from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Task } from '@/types';
 import { TaskList } from '@/components/task-list';
 import { AddTaskForm } from '@/components/add-task-form';
 import { TaskReportModal } from '@/components/task-report-modal';
+import { PomodoroTimer } from '@/components/pomodoro-timer'; // Nueva importación
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon } from 'lucide-react'; // Added Sun, Moon
+import { Plus, ListChecks, Archive, Settings, FileText, Info, Loader2, Sun, Moon, ListTodo, Timer } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,6 +67,7 @@ const saveTasksToLocalStorage = (tasks: Task[]) => {
 
 type FilterType = "all" | "completed" | "active";
 type Theme = "light" | "dark";
+type ActiveSection = "tasks" | "pomodoro"; // Nuevo tipo
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -79,13 +80,13 @@ export default function Home() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [theme, setTheme] = useState<Theme>('light');
+  const [activeSection, setActiveSection] = useState<ActiveSection>('tasks'); // Nuevo estado
   const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
     setTasks(loadTasksFromLocalStorage());
 
-    // Initialize theme
     const storedTheme = localStorage.getItem('pixelPlannerTheme') as Theme | null;
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
@@ -130,7 +131,7 @@ export default function Home() {
   const handleFormDialogClose = (open: boolean) => {
     setIsFormDialogOpen(open);
     if (!open) {
-      setTaskToEdit(null); // Reset taskToEdit when dialog closes
+      setTaskToEdit(null);
     }
   };
 
@@ -235,7 +236,7 @@ export default function Home() {
             PixelPlanner
           </CardTitle>
            <CardDescription className="text-xs sm:text-sm text-muted-foreground flex items-center justify-center gap-1">
-             Tus tareas diarias, ¡con un toque pixelado! 
+             Tus tareas y pomodoros, ¡con un toque pixelado! 
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Info className="h-3 w-3 cursor-help text-muted-foreground/70 hover:text-muted-foreground"/>
@@ -254,23 +255,24 @@ export default function Home() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="rounded-none border-2 border-foreground bg-card shadow-xl">
-                <DropdownMenuLabel>Acciones Rápidas</DropdownMenuLabel>
-                <DropdownMenuSeparator/>
-                <DropdownMenuItem onClick={markAllAsComplete} className="cursor-pointer hover:!bg-accent/80 focus:!bg-accent/90">
-                  <ListChecks className="mr-2 h-4 w-4" />
-                  <span>Marcar Todas Como Completas</span>
-                </DropdownMenuItem>
-                 <DropdownMenuItem onClick={() => setIsReportModalOpen(true)} className="cursor-pointer hover:!bg-accent/80 focus:!bg-accent/90">
-                  <FileText className="mr-2 h-4 w-4" />
-                  <span>Ver Reporte de Tiempo</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator/>
+                <DropdownMenuLabel>Opciones Generales</DropdownMenuLabel>
+                 <DropdownMenuSeparator/>
                 <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer hover:!bg-accent/80 focus:!bg-accent/90">
                   {theme === 'light' ? <Moon className="mr-2 h-4 w-4" /> : <Sun className="mr-2 h-4 w-4" />}
                   <span>Cambiar a Tema {theme === 'light' ? 'Oscuro' : 'Claro'}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator/>
-                <DropdownMenuItem onClick={clearAllTasks} className="text-destructive cursor-pointer hover:!bg-destructive/10 hover:!text-destructive focus:!bg-destructive/20 focus:!text-destructive">
+                <DropdownMenuLabel>Acciones de Tareas</DropdownMenuLabel>
+                <DropdownMenuSeparator/>
+                <DropdownMenuItem onClick={markAllAsComplete} disabled={activeSection !== 'tasks'} className="cursor-pointer hover:!bg-accent/80 focus:!bg-accent/90">
+                  <ListChecks className="mr-2 h-4 w-4" />
+                  <span>Marcar Todas Como Completas</span>
+                </DropdownMenuItem>
+                 <DropdownMenuItem onClick={() => setIsReportModalOpen(true)} disabled={activeSection !== 'tasks'} className="cursor-pointer hover:!bg-accent/80 focus:!bg-accent/90">
+                  <FileText className="mr-2 h-4 w-4" />
+                  <span>Ver Reporte de Tiempo</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={clearAllTasks} disabled={activeSection !== 'tasks'} className="text-destructive cursor-pointer hover:!bg-destructive/10 hover:!text-destructive focus:!bg-destructive/20 focus:!text-destructive">
                   <Archive className="mr-2 h-4 w-4" />
                   <span>Eliminar Todas las Tareas</span>
                 </DropdownMenuItem>
@@ -278,85 +280,119 @@ export default function Home() {
             </DropdownMenu>
           </div>
         </CardHeader>
-        <Separator className="mb-4 sm:mb-6 border-t-2 border-foreground"/>
+        
+        <div className="flex justify-center border-b-2 border-foreground mb-1 sm:mb-2">
+          <Button
+            variant={activeSection === 'tasks' ? 'default' : 'ghost'}
+            onClick={() => setActiveSection('tasks')}
+            className={cn(
+              "flex-1 sm:flex-none rounded-none px-4 py-3 text-sm sm:text-base",
+              activeSection === 'tasks' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
+              activeSection !== 'tasks' && "border-transparent"
+            )}
+          >
+            <ListTodo className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            Tareas
+          </Button>
+          <Button
+            variant={activeSection === 'pomodoro' ? 'default' : 'ghost'}
+            onClick={() => setActiveSection('pomodoro')}
+            className={cn(
+              "flex-1 sm:flex-none rounded-none px-4 py-3 text-sm sm:text-base",
+              activeSection === 'pomodoro' ? "border-b-0 border-x-2 border-t-2 border-primary-foreground btn-pixel shadow-none" : "text-muted-foreground hover:bg-accent/10",
+              activeSection !== 'pomodoro' && "border-transparent"
+            )}
+          >
+            <Timer className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            Pomodoro
+          </Button>
+        </div>
+        
         <CardContent className="flex flex-col flex-grow overflow-hidden p-2 sm:p-6">
-          <div className="mb-3 sm:mb-4">
-            <div className="flex justify-between items-center mb-1">
-              <p className="text-xs sm:text-sm text-muted-foreground">Progreso:</p>
-              <p className="text-xs sm:text-sm font-semibold text-primary">{`${completedTasksCount} / ${totalTasksCount} completadas`}</p>
-            </div>
-            <Progress 
-              value={progressPercentage} 
-              aria-label={`Progreso de tareas: ${Math.round(progressPercentage)}% completado`}
-              className="h-2 sm:h-3 rounded-none bg-muted border border-foreground" 
-              indicatorClassName="bg-primary" 
-            />
-          </div>
+          {activeSection === 'tasks' && (
+            <>
+              <div className="mb-3 sm:mb-4">
+                <div className="flex justify-between items-center mb-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Progreso:</p>
+                  <p className="text-xs sm:text-sm font-semibold text-primary">{`${completedTasksCount} / ${totalTasksCount} completadas`}</p>
+                </div>
+                <Progress 
+                  value={progressPercentage} 
+                  aria-label={`Progreso de tareas: ${Math.round(progressPercentage)}% completado`}
+                  className="h-2 sm:h-3 rounded-none bg-muted border border-foreground" 
+                  indicatorClassName="bg-primary" 
+                />
+              </div>
 
-           <div className="flex flex-col sm:flex-row gap-2 mb-4 sm:mb-6">
-            <input
-              type="text"
-              placeholder="Buscar tareas (título, desc, categoría)..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-grow p-2 border-2 border-input bg-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring text-sm placeholder:text-muted-foreground/80"
-            />
-            <div className="flex gap-1 sm:gap-2">
-              {(["all", "active", "completed"] as FilterType[]).map(filterType => (
-                <Button
-                  key={filterType}
-                  variant={filter === filterType ? "default" : "outline"}
-                  onClick={() => setFilter(filterType)}
-                  className={cn(
-                    "capitalize flex-1 sm:flex-initial rounded-none border-2 text-xs px-2 py-1 h-auto sm:text-sm",
-                    filter === filterType ? "btn-pixel border-primary-foreground" : "border-foreground hover:bg-accent/50",
-                    filter !== filterType && "shadow-[1px_1px_0px_0px_hsl(var(--foreground))] hover:shadow-[0.5px_0.5px_0px_0px_hsl(var(--foreground))]"
-                  )}
-                >
-                  {filterType === "all" ? "Todas" : filterType === "active" ? "Activas" : "Completas"}
-                </Button>
-              ))}
-            </div>
-          </div>
-          
-          <div className="flex flex-col flex-grow overflow-hidden min-h-0">
-            {isClient ? (
-              <>
-                {sortedTasks.length > 0 ? (
-                  <TaskList
-                    tasks={sortedTasks}
-                    onToggleComplete={handleToggleComplete}
-                    onDeleteRequest={handleDeleteRequest}
-                    onEditRequest={handleOpenEditTaskDialog}
-                    className="flex-grow" 
-                  />
-                ) : (
-                  <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="1" strokeLinecap="butt" strokeLinejoin="bevel" className="opacity-50 mb-4 image-pixelated"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
-                    {tasks.length === 0 ? (
-                      <p className="text-muted-foreground">¡No hay tareas aún! Añade una para empezar.</p>
-                    ) : searchTerm ? (
-                      <p className="text-muted-foreground">No se encontraron tareas con "{searchTerm}".</p>
+               <div className="flex flex-col sm:flex-row gap-2 mb-4 sm:mb-6">
+                <input
+                  type="text"
+                  placeholder="Buscar tareas (título, desc, categoría)..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="flex-grow p-2 border-2 border-input bg-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring text-sm placeholder:text-muted-foreground/80"
+                />
+                <div className="flex gap-1 sm:gap-2">
+                  {(["all", "active", "completed"] as FilterType[]).map(filterType => (
+                    <Button
+                      key={filterType}
+                      variant={filter === filterType ? "default" : "outline"}
+                      onClick={() => setFilter(filterType)}
+                      className={cn(
+                        "capitalize flex-1 sm:flex-initial rounded-none border-2 text-xs px-2 py-1 h-auto sm:text-sm",
+                        filter === filterType ? "btn-pixel border-primary-foreground" : "border-foreground hover:bg-accent/50",
+                        filter !== filterType && "shadow-[1px_1px_0px_0px_hsl(var(--foreground))] hover:shadow-[0.5px_0.5px_0px_0px_hsl(var(--foreground))]"
+                      )}
+                    >
+                      {filterType === "all" ? "Todas" : filterType === "active" ? "Activas" : "Completas"}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex flex-col flex-grow overflow-hidden min-h-0">
+                {isClient ? (
+                  <>
+                    {sortedTasks.length > 0 ? (
+                      <TaskList
+                        tasks={sortedTasks}
+                        onToggleComplete={handleToggleComplete}
+                        onDeleteRequest={handleDeleteRequest}
+                        onEditRequest={handleOpenEditTaskDialog}
+                        className="flex-grow" 
+                      />
                     ) : (
-                       <p className="text-muted-foreground">No hay tareas que coincidan con el filtro <span className="font-semibold text-foreground/80">{filter === "all" ? "todas" : filter}</span>.</p>
+                      <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="1" strokeLinecap="butt" strokeLinejoin="bevel" className="opacity-50 mb-4 image-pixelated"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                        {tasks.length === 0 ? (
+                          <p className="text-muted-foreground">¡No hay tareas aún! Añade una para empezar.</p>
+                        ) : searchTerm ? (
+                          <p className="text-muted-foreground">No se encontraron tareas con "{searchTerm}".</p>
+                        ) : (
+                           <p className="text-muted-foreground">No hay tareas que coincidan con el filtro <span className="font-semibold text-foreground/80">{filter === "all" ? "todas" : filter}</span>.</p>
+                        )}
+                         <Button onClick={handleOpenAddTaskDialog} className="mt-6 btn-pixel">
+                            <Plus className="mr-2 h-4 w-4" /> Añadir Primera Tarea
+                         </Button>
+                      </div>
                     )}
-                     <Button onClick={handleOpenAddTaskDialog} className="mt-6 btn-pixel">
-                        <Plus className="mr-2 h-4 w-4" /> Añadir Primera Tarea
-                     </Button>
+                  </>
+                ) : (
+                   <div className="flex-grow flex flex-col items-center justify-center p-8">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+                    <p className="text-center text-muted-foreground">Cargando tareas pixeladas...</p>
                   </div>
                 )}
-              </>
-            ) : (
-               <div className="flex-grow flex flex-col items-center justify-center p-8">
-                <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                <p className="text-center text-muted-foreground">Cargando tareas pixeladas...</p>
               </div>
-            )}
-          </div>
+            </>
+          )}
+          {activeSection === 'pomodoro' && (
+            <PomodoroTimer />
+          )}
         </CardContent>
       </Card>
 
-      {isClient && (
+      {isClient && activeSection === 'tasks' && (
         <>
           <AddTaskForm
             isOpen={isFormDialogOpen}
