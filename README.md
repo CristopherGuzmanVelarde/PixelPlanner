@@ -14,6 +14,8 @@ PixelPlanner es una aplicación web diseñada para ayudarte a organizar tus tare
     *   Visualiza el progreso general de tus tareas.
     *   Opción para marcar todas las tareas como completas o eliminar todas las tareas.
     *   Reporte de tiempo dedicado a las tareas con visualización gráfica.
+![image](https://github.com/user-attachments/assets/c59bce7e-3adc-4f64-afe3-68df1d8c64be)
+
 *   **Temporizador Pomodoro Integrado**:
     *   Temporizador configurable para sesiones de trabajo (Pomodoro), descansos cortos y descansos largos.
     *   Notificaciones (toast) al finalizar cada ciclo.
@@ -162,9 +164,4 @@ La aplicación utiliza Genkit para interactuar con los modelos de IA de Google G
 
 *   **Tareas**: El estado de las tareas (lista, completadas, etc.) se guarda en el `localStorage` del navegador. Esto significa que las tareas permanecerán incluso si el usuario cierra la pestaña o el navegador.
 *   **Tema (Claro/Oscuro)**: La preferencia de tema también se almacena en `localStorage` para que se aplique en futuras visitas.
-
-## 📄 Licencia
-
-Este proyecto es para fines de demostración.
-```
 
